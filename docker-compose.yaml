@@ -1,0 +1,52 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres
+    container_name: db
+    volumes:
+      - ~/motify/data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_NAME=postgresdb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres123motify
+    ports:
+      - "5432:5432"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    hostname: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    restart: on-failure
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    hostname: redis
+    restart: always
+    ports:
+      - '6379:6379'
+      - '16379:16379'
+    command: redis-server --requirepass Mohammad@99
+
+  gateway:
+    build: gateway/
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:7777"
+    container_name: gateway
+    working_dir: /code/gateway/
+    volumes:
+      - ./gateway:/code/gateway/
+    ports:
+      - "7777:7777"
+    environment:
+      - POSTGRES_NAME=gateway
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres123motify
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
+    restart: on-failure
