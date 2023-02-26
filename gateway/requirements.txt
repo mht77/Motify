@@ -10,12 +10,15 @@ djangorestframework==3.14.0
 djangorestframework-simplejwt==5.2.2
 drf-yasg==1.21.5
 google-auth==2.16.1
+grpcio==1.51.3
+grpcio-tools==1.51.3
 idna==3.4
 inflection==0.5.1
 itypes==1.2.0
 Jinja2==3.1.2
 MarkupSafe==2.1.2
 packaging==23.0
+protobuf==4.22.0
 psycopg2==2.9.5
 pyasn1==0.4.8
 pyasn1-modules==0.2.8

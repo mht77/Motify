@@ -6,18 +6,17 @@ from rest_framework import permissions
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
 schema_view = get_schema_view(
-   openapi.Info(
-      title="gateway API",
-      default_version='v1',
-      description="gateway swagger doc",
-      terms_of_service="MHT policies",
-      contact=openapi.Contact(email="m.h.t.1377@gmail.com"),
-      license=openapi.License(name="BSD License"),
-   ),
-   public=True,
-   permission_classes=[permissions.AllowAny],
+    openapi.Info(
+        title="gateway API",
+        default_version='v1',
+        description="gateway swagger doc",
+        terms_of_service="MHT policies",
+        contact=openapi.Contact(email="m.h.t.1377@gmail.com"),
+        license=openapi.License(name="BSD License"),
+    ),
+    public=True,
+    permission_classes=[permissions.AllowAny],
 )
-
 
 urlpatterns = [
     path('admin/', admin.site.urls),
