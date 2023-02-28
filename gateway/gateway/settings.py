@@ -119,4 +119,4 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-GRPC_PORT = os.environ.get('GRPC_PORT', '50051')
+GRPC_PORT = os.environ.get('GRPC_PORT', '50052')

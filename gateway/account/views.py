@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import AccessToken
 
 from gateway import settings
-from account.serializers import AccountSerializer, UserOutputSerializer, UserInputSerializer
+from account.serializers import AccountSerializer, UserOutputSerializer, UserInputSerializer, UserUpdateSerializer
 
 import requests
 from drf_yasg import openapi
@@ -43,15 +43,15 @@ class UserView(APIView):
                             status=status.HTTP_201_CREATED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    # @swagger_auto_schema(request_body=UserUpdateSerializer)
-    # def put(self, request):
-    #     serializer = UserUpdateSerializer(data=request.data)
-    #     serializer.is_valid()
-    #     if serializer.is_valid(raise_exception=True):
-    #         serializer.update(instance=request.user, validated_data=serializer.data)
-    #         return Response(data=UserOutputSerializer(User.objects.get(id=request.user.id)).data,
-    #                         status=status.HTTP_200_OK)
-    #     return Response(status=status.HTTP_400_BAD_REQUEST)
+    @swagger_auto_schema(request_body=UserUpdateSerializer)
+    def put(self, request):
+        serializer = UserUpdateSerializer(data=request.data)
+        serializer.is_valid()
+        if serializer.is_valid(raise_exception=True):
+            serializer.update(instance=request.user, validated_data=serializer.data)
+            return Response(data=UserOutputSerializer(User.objects.get(id=request.user.id)).data,
+                            status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class AccountView(APIView):

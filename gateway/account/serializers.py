@@ -9,6 +9,7 @@ class UserOutputSerializer(serializers.ModelSerializer):
     """
     User DTO for GET request
     """
+
     class Meta:
         model = User
         fields = ['id', 'email', 'username', 'date_joined']
@@ -35,6 +36,24 @@ class UserInputSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ['email', 'password']
         model = User
+
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    """
+    User model DTO for PUT request
+    """
+    password = serializers.CharField(required=True, min_length=8)
+    email = serializers.EmailField(required=True, min_length=5)
+
+    def update(self, instance, validated_data):
+        user = User.objects.get(email=validated_data['email'])
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
+
+    class Meta:
+        model = User
+        fields = ['email', 'password']
 
 
 class AccountSerializer(serializers.ModelSerializer):
