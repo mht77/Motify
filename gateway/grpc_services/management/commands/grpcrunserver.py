@@ -3,16 +3,16 @@ from concurrent import futures
 import grpc
 from django.core.management.base import BaseCommand
 
-from grpc_services import user_pb2_grpc
-from grpc_services.user_service import UserService
+import account_pb2_grpc
+from gateway import settings
+from grpc_services.account_service import AccountService
 
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        port = '50051'
         server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-        user_pb2_grpc.add_UserServiceServicer_to_server(UserService(), server)
-        server.add_insecure_port('[::]:' + port)
+        account_pb2_grpc.add_AccountServiceServicer_to_server(AccountService(), server)
+        server.add_insecure_port('[::]:' + settings.GRPC_PORT)
         server.start()
-        print("Server started, listening on " + port)
+        print("Server started, listening on " + settings.GRPC_PORT)
         server.wait_for_termination()

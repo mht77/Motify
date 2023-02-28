@@ -33,14 +33,17 @@ services:
     command: redis-server --requirepass Mohammad@99
 
   gateway:
-    build: gateway/
-    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:7777"
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    command: sh -c "chmod +x ./run.sh && ./run.sh"
     container_name: gateway
     working_dir: /code/gateway/
     volumes:
       - ./gateway:/code/gateway/
     ports:
       - "7777:7777"
+      - "50051:50051"
     environment:
       - POSTGRES_NAME=gateway
       - POSTGRES_USER=postgres
