@@ -1,0 +1,51 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+    - $(Build.SourcesDirectory)/gateway
+
+resources:
+- repo: self
+
+pool: 
+   vmImage: ubuntu-latest
+
+variables:
+  dockerRegistryServiceConnection: 'a4d10f07-2d31-481c-9fc0-77de7e0a6cd2'
+  imageRepository: 'motifygateway'
+  containerRegistry: 'motifybackend.azurecr.io'
+  dockerfilePath: '$(Build.SourcesDirectory)/gateway/Dockerfile'
+  tag: '$(Build.BuildId)'
+
+stages:
+- stage: Test
+  displayName: Run differnt types of test
+  jobs:
+  - job: Test
+    displayName: Unit and Integration tests
+    steps:
+    - task: PythonScript@0
+      inputs:
+        scriptSource: 'inline'
+        script: 'python manage.py test'
+        workingDirectory: '$(Build.SourcesDirectory)/gateway/'
+
+- stage: Docker Build
+  displayName: Build and push docker image
+  jobs:
+  - job: Build
+    displayName: Build docker image
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: Docker@2
+      displayName: Build and push an image to container registry
+      inputs:
+        command: buildAndPush
+        repository: $(imageRepository)
+        dockerfile: $(dockerfilePath)
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(tag)
