@@ -26,11 +26,20 @@ stages:
   - job: Test
     displayName: Unit and Integration tests
     steps:
-    - task: PythonScript@0
+    - script: |
+        python -m pip install --upgrade pip setuptools wheel
+        pip install -r requirements.txt
+        pip install unittest-xml-reporting
+      displayName: 'Install prerequisites'
+    - script: |
+        pushd '$(projectRoot)'
+        python manage.py test --testrunner xmlrunner.extra.djangotestrunner.XMLTestRunner --no-input
+      displayName: 'Run tests'
+    - task: PublishTestResults@2
       inputs:
-        scriptSource: 'inline'
-        script: 'python manage.py test'
-        workingDirectory: '$(Build.SourcesDirectory)/gateway/'
+        testResultsFiles: "**/TEST-*.xml"
+        testRunTitle: 'Python $(PYTHON_VERSION)'
+      condition: succeededOrFailed()
 
 - stage: Docker_Build
   displayName: Build and push docker image
