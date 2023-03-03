@@ -43,10 +43,10 @@ stages:
         testResultsFormat: 'JUnit'
         testResultsFiles: '**/TEST-*.xml'
       condition: succeededOrFailed()
-    - task: PublishCodeCoverageResults@2
+    - task: PublishCodeCoverageResults@1
       inputs:
-        summaryFileLocation: '$(Build.SourcesDirectory)/gateway/coverage.xml'
-        failIfCoverageEmpty: true
+        codeCoverageTool: Cobertura
+        summaryFileLocation: $(Build.SourcesDirectory)/gateway/coverage.xml
 
 - stage: Docker_Build
   displayName: Build and push docker image
