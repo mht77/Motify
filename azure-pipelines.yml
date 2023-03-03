@@ -35,9 +35,8 @@ stages:
       displayName: 'Install prerequisites'
     - script: |
         pushd '$(Build.SourcesDirectory)/gateway'
-        coverage run manage.py test --testrunner xmlrunner.extra.djangotestrunner.XMLTestRunner --no-input
+        coverage run --source='.' manage.py test --testrunner xmlrunner.extra.djangotestrunner.XMLTestRunner --no-input
         coverage xml
-        coverage html
       displayName: 'Run tests'
     - task: PublishTestResults@2
       inputs:
@@ -48,7 +47,6 @@ stages:
       inputs:
         codeCoverageTool: 'Cobertura'
         summaryFileLocation: '$(Build.SourcesDirectory)/gateway/coverage.xml'
-        reportDirectory: '$(Build.SourcesDirectory)/gateway/htmlcov/'
 
 - stage: Docker_Build
   displayName: Build and push docker image
