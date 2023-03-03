@@ -35,13 +35,18 @@ stages:
       displayName: 'Install prerequisites'
     - script: |
         pushd '$(Build.SourcesDirectory)/gateway'
-        python manage.py test --testrunner xmlrunner.extra.djangotestrunner.XMLTestRunner --no-input
+        coverage run manage.py test --testrunner xmlrunner.extra.djangotestrunner.XMLTestRunner --no-input
+        coverage xml
       displayName: 'Run tests'
     - task: PublishTestResults@2
       inputs:
         testResultsFormat: 'JUnit'
         testResultsFiles: '**/TEST-*.xml'
       condition: succeededOrFailed()
+    - task: PublishCodeCoverageResults@2
+      inputs:
+        summaryFileLocation: '$(Build.SourcesDirectory)/gateway/coverage.xml'
+        failIfCoverageEmpty: true
 
 - stage: Docker_Build
   displayName: Build and push docker image
