@@ -3,7 +3,7 @@ import os
 import sys
 
 
-def main():
+def main():  # pragma no cover
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gateway.settings')
     try:

@@ -46,10 +46,9 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True, min_length=5)
 
     def update(self, instance, validated_data):
-        user = User.objects.get(email=validated_data['email'])
-        user.set_password(validated_data['password'])
-        user.save()
-        return user
+        instance.set_password(validated_data['password'])
+        instance.save()
+        return instance
 
     class Meta:
         model = User

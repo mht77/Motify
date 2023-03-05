@@ -120,3 +120,5 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 GRPC_PORT = os.environ.get('GRPC_PORT', '50052')
+
+CLIENT_ID = '613574977749-5jbafsg1jvtmk7l6tc3o0u6b3til1nbv.apps.googleusercontent.com'
