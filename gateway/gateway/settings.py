@@ -8,8 +8,10 @@ SECRET_KEY = 'django-insecure-!iu@upgh+j8ay_ll^xlsa-xyp=-uoyy9%4lu1ejha&l2*6a(e7
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost',
-                 '0.0.0.0',
+ALLOWED_HOSTS = [
+    'localhost',
+    '0.0.0.0',
+    '127.0.0.1'
                  ]
 
 INSTALLED_APPS = [
@@ -19,6 +21,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'drf_yasg',
+    'grpc_services',
+    'account'
 ]
 
 MIDDLEWARE = [
@@ -30,6 +36,22 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
+
+CORS_ORIGIN_WHITELIST = (
+  'http://localhost',
+)
+
 
 ROOT_URLCONF = 'gateway.urls'
 
@@ -52,13 +74,26 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'gateway.wsgi.application'
 
+SWAGGER_SETTINGS = {
+   'SECURITY_DEFINITIONS': {
+      'Basic': {
+            'type': 'basic'
+      },
+      'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+      },
+   }
+}
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_NAME'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-        'USER': os.environ.get('POSTGRES_USER'),
-        'HOST': 'db',
+        'NAME': os.environ.get('POSTGRES_NAME', "gateway"),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', "postgres123motify"),
+        'USER': os.environ.get('POSTGRES_USER', "postgres"),
+        'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),
         'PORT': 5432
     }
 }
@@ -83,3 +118,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+GRPC_PORT = os.environ.get('GRPC_PORT', '50052')
+
+CLIENT_ID = '613574977749-5jbafsg1jvtmk7l6tc3o0u6b3til1nbv.apps.googleusercontent.com'
