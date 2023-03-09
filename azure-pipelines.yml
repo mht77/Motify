@@ -26,26 +26,40 @@ stages:
   - job: Test
     displayName: Unit and Integration tests
     steps:
-    - task: PythonScript@0
+    - script: docker run --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=postgres123motify -d postgres
+      displayName: Run postgres container
+    - script: |
+        pushd '$(Build.SourcesDirectory)/gateway'
+        python -m pip install --upgrade pip setuptools wheel
+        pip install -r requirements.txt
+      displayName: 'Install prerequisites'
+    - script: |
+        pushd '$(Build.SourcesDirectory)/gateway'
+        coverage run --source='.' manage.py test --testrunner xmlrunner.extra.djangotestrunner.XMLTestRunner --no-input
+        coverage xml
+      displayName: 'Run tests'
+    - task: PublishTestResults@2
       inputs:
-        scriptSource: 'inline'
-        script: 'python manage.py test'
-        workingDirectory: '$(Build.SourcesDirectory)/gateway/'
+        testResultsFormat: 'JUnit'
+        testResultsFiles: '**/TEST-*.xml'
+      condition: succeededOrFailed()
+    - task: PublishCodeCoverageResults@1
+      inputs:
+        codeCoverageTool: 'Cobertura'
+        summaryFileLocation: '$(Build.SourcesDirectory)/gateway/coverage.xml'
 
-- stage: Docker Build
+- stage: Docker_Build
   displayName: Build and push docker image
   jobs:
   - job: Build
     displayName: Build docker image
-    pool:
-      vmImage: $(vmImageName)
     steps:
     - task: Docker@2
       displayName: Build and push an image to container registry
       inputs:
-        command: buildAndPush
-        repository: $(imageRepository)
-        dockerfile: $(dockerfilePath)
-        containerRegistry: $(dockerRegistryServiceConnection)
-        tags: |
-          $(tag)
+        containerRegistry: '$(dockerRegistryServiceConnection)'
+        repository: '$(imageRepository)'
+        command: 'buildAndPush'
+        Dockerfile: '$(dockerfilePath)'
+        buildContext: '$(Build.SourcesDirectory)'
+        tags: '$(tag)'
