@@ -36,7 +36,7 @@ services:
     build:
       context: .
       dockerfile: gateway/Dockerfile
-    command: sh -c "chmod +x ./run.sh && ./run.sh"
+#    command: sh -c "chmod +x ./run.sh && ./run.sh"
     container_name: gateway
     working_dir: /code/gateway/
     volumes:
@@ -49,6 +49,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres123motify
       - POSTGRES_HOST=db
+      - GRPC_PORT=50051
     depends_on:
       - db
       - redis

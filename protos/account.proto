@@ -12,7 +12,7 @@ message GetAccountsRequest {
 }
 
 message GetAccountsResponse {
-    repeated Account accounts = 1;
+    map<string, Account> accounts = 1;
 }
 
 message Account {

@@ -7,3 +7,4 @@ COPY /protos/account.proto /code/protos/
 RUN python -m pip install --upgrade pip
 RUN pip install -r requirements.txt
 COPY /gateway/ /code/gateway/
+ENTRYPOINT ./run.sh
