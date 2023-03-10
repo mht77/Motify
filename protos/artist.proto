@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package motify.music;
+
+service ArtistService{
+  rpc GetArtist(Id) returns (Artist) {}
+  rpc GetArtists(Ids) returns (Artists) {}
+  rpc CreateArtist(Artist) returns (Artist) {}
+}
+
+message Artists {
+  repeated Artist artists = 1;
+}
+message Ids {
+  repeated string id = 1;
+}
+
+message Id {
+  string id = 1;
+}
+
+message Artist {
+  optional string id = 1;
+  string name = 2;
+  string user = 3;
+  uint64 no_plays = 4;
+}
