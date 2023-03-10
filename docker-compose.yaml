@@ -50,6 +50,7 @@ services:
       - POSTGRES_PASSWORD=postgres123motify
       - POSTGRES_HOST=db
       - GRPC_PORT=50051
+      - RABBITMQ_HOST=rabbitmq
     depends_on:
       - db
       - redis
@@ -73,6 +74,7 @@ services:
       - POSTGRES_PASSWORD=postgres123motify
       - POSTGRES_HOST=db
       - GRPC_PORT=50061
+      - RABBITMQ_HOST=rabbitmq
     depends_on:
       - db
       - redis

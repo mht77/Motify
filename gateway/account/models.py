@@ -1,11 +1,14 @@
 import uuid
 
 from django.contrib.auth.models import User
+from django.core import serializers
 from django.db import models
 from django.db.models import CASCADE
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
+
+from utils.producers import UserCreatedEvent
 
 
 class Subscriptions(models.TextChoices):
@@ -43,3 +46,4 @@ def create_account(sender, instance, created, **kwargs):
     if instance and created and sender is User:
         account = Account(user=instance, id=uuid.uuid4())
         account.save()
+        UserCreatedEvent().call(account=serializers.serialize("json", account))
