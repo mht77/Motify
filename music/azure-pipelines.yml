@@ -1,0 +1,65 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+    - music
+
+resources:
+- repo: self
+
+pool: 
+   vmImage: ubuntu-latest
+
+variables:
+  dockerRegistryServiceConnection: 'a4d10f07-2d31-481c-9fc0-77de7e0a6cd2'
+  imageRepository: 'motifymusic'
+  containerRegistry: 'motifybackend.azurecr.io'
+  dockerfilePath: '$(Build.SourcesDirectory)/music/Dockerfile'
+  tag: '$(Build.BuildId)'
+
+stages:
+- stage: Test
+  displayName: Run differnt types of test
+  jobs:
+  - job: Test
+    displayName: Unit and Integration tests
+    steps:
+    - script: docker run --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=postgres123motify -d postgres
+      displayName: Run postgres container
+    - script: |
+        pushd '$(Build.SourcesDirectory)/music'
+        python -m pip install --upgrade pip setuptools wheel
+        pip install -r requirements.txt
+      displayName: 'Install prerequisites'
+    - script: |
+        pushd '$(Build.SourcesDirectory)/music'
+        coverage run --source='.' manage.py test --testrunner xmlrunner.extra.djangotestrunner.XMLTestRunner --no-input
+        coverage xml
+      displayName: 'Run tests'
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: '**/TEST-*.xml'
+      condition: succeededOrFailed()
+    - task: PublishCodeCoverageResults@1
+      inputs:
+        codeCoverageTool: 'Cobertura'
+        summaryFileLocation: '$(Build.SourcesDirectory)/music/coverage.xml'
+
+- stage: Docker_Build
+  displayName: Build and push docker image
+  jobs:
+  - job: Build
+    displayName: Build docker image
+    steps:
+    - task: Docker@2
+      displayName: Build and push an image to container registry
+      inputs:
+        containerRegistry: '$(dockerRegistryServiceConnection)'
+        repository: '$(imageRepository)'
+        command: 'buildAndPush'
+        Dockerfile: '$(dockerfilePath)'
+        buildContext: '$(Build.SourcesDirectory)'
+        tags: '$(tag)'
