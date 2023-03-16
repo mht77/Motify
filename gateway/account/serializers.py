@@ -1,8 +1,13 @@
+import uuid
+
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from account.models import Account
+from utils.producers import UserCreatedEvent
 
 
 class UserOutputSerializer(serializers.ModelSerializer):
@@ -61,3 +66,17 @@ class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
         fields = '__all__'
+
+
+# noinspection PyUnusedLocal
+@receiver(post_save, sender=User)
+def create_account(sender, instance, created, **kwargs):
+    """
+    create account whenever a user model created
+    :param sender: the model type
+    :param instance: the instance of model
+    :param created: if it is new (created on db) or it is updated
+    """
+    if instance and created and sender is User:
+        account = Account.objects.create(user=instance, id=uuid.uuid4())
+        UserCreatedEvent().call(account=AccountSerializer(account).data)

@@ -4,7 +4,7 @@ trigger:
       - main
   paths:
     include:
-    - gateway
+    - music
 
 resources:
 - repo: self
@@ -14,9 +14,9 @@ pool:
 
 variables:
   dockerRegistryServiceConnection: 'a4d10f07-2d31-481c-9fc0-77de7e0a6cd2'
-  imageRepository: 'motifygateway'
+  imageRepository: 'motifymusic'
   containerRegistry: 'motifybackend.azurecr.io'
-  dockerfilePath: '$(Build.SourcesDirectory)/gateway/Dockerfile'
+  dockerfilePath: '$(Build.SourcesDirectory)/music/Dockerfile'
   tag: '$(Build.BuildId)'
 
 stages:
@@ -28,15 +28,13 @@ stages:
     steps:
     - script: docker run --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=postgres123motify -d postgres
       displayName: Run postgres container
-    - script: docker run --name rabbitmq -p 5672:5672 -p 15672:15672  -d rabbitmq:3-management
-      displayName: Run rabbitmq container
     - script: |
-        pushd '$(Build.SourcesDirectory)/gateway'
+        pushd '$(Build.SourcesDirectory)/music'
         python -m pip install --upgrade pip setuptools wheel
         pip install -r requirements.txt
       displayName: 'Install prerequisites'
     - script: |
-        pushd '$(Build.SourcesDirectory)/gateway'
+        pushd '$(Build.SourcesDirectory)/music'
         coverage run --source='.' manage.py test --testrunner xmlrunner.extra.djangotestrunner.XMLTestRunner --no-input
         coverage xml
       displayName: 'Run tests'
@@ -48,8 +46,7 @@ stages:
     - task: PublishCodeCoverageResults@1
       inputs:
         codeCoverageTool: 'Cobertura'
-        summaryFileLocation: '$(Build.SourcesDirectory)/gateway/coverage.xml'
-    - task: QodanaScan@2022
+        summaryFileLocation: '$(Build.SourcesDirectory)/music/coverage.xml'
 
 - stage: Docker_Build
   displayName: Build and push docker image

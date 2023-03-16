@@ -50,6 +50,31 @@ services:
       - POSTGRES_PASSWORD=postgres123motify
       - POSTGRES_HOST=db
       - GRPC_PORT=50051
+      - RABBITMQ_HOST=rabbitmq
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
+    restart: on-failure
+
+  music:
+    build:
+      context: .
+      dockerfile: music/Dockerfile
+    container_name: music
+    working_dir: /code/music/
+    volumes:
+      - ./music:/code/music/
+    ports:
+      - "7778:7778"
+      - "50061:50061"
+    environment:
+      - POSTGRES_NAME=music
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres123motify
+      - POSTGRES_HOST=db
+      - GRPC_PORT=50061
+      - RABBITMQ_HOST=rabbitmq
     depends_on:
       - db
       - redis
