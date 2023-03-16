@@ -47,6 +47,7 @@ stages:
       inputs:
         codeCoverageTool: 'Cobertura'
         summaryFileLocation: '$(Build.SourcesDirectory)/gateway/coverage.xml'
+    - task: QodanaScan@2022
 
 - stage: Docker_Build
   displayName: Build and push docker image
