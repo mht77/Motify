@@ -28,6 +28,8 @@ stages:
     steps:
     - script: docker run --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=postgres123motify -d postgres
       displayName: Run postgres container
+    - script: docker run --name rabbitmq -p 5672:5672 15672:15672  -d rabbitmq:3-management
+      displayName: Run rabbitmq container
     - script: |
         pushd '$(Build.SourcesDirectory)/gateway'
         python -m pip install --upgrade pip setuptools wheel
