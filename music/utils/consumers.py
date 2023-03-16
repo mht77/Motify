@@ -14,15 +14,26 @@ class UserCreatedListener(threading.Thread):
 
     def __init__(self):
         super().__init__()
+        self.retry = 0
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=settings.RABBITMQ_HOST, heartbeat=5))
         self.channel = self.connection.channel()
 
     # noinspection PyUnusedLocal
-    @staticmethod
-    def callback(ch, method, properties, body):
-        print(f'User Created: {msgpack.unpackb(body)["id"]}')
-        print(f'User Created: {msgpack.unpackb(body)}')
-        ch.basic_ack(delivery_tag=method.delivery_tag)
+    # @staticmethod
+    def callback(self, ch, method, properties, body):
+        try:
+            print(f'User Created: {msgpack.unpackb(body)["id"]}')
+            print(f'User Created: {msgpack.unpackb(body)}')
+            ch.basic_ack(delivery_tag=method.delivery_tag)
+            self.retry = 0
+        except Exception as e:
+            print(e)
+            self.retry += 1
+            if self.retry > 5:
+                ch.basic_ack(delivery_tag=method.delivery_tag)
+                self.retry = 0
+            else:
+                ch.basic_nack(delivery_tag=method.delivery_tag)
 
     def run(self):
         self.channel.queue_declare(queue='music_user', durable=True)

@@ -11,7 +11,6 @@ class Producer(ABC):
     parent class for publishing msg on a rabbitmq queue
     """
     def __init__(self):
-        self.channel = None
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=settings.RABBITMQ_HOST))
         self.channel = self.connection.channel()
 
