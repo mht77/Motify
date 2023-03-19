@@ -52,6 +52,7 @@ services:
       - GRPC_PORT=50051
       - RABBITMQ_HOST=rabbitmq
       - REDIS=redis
+      - MUSIC_SERVICE=music:50061
     depends_on:
       - db
       - redis

@@ -26,6 +26,8 @@ class ArtistService(artist_pb2_grpc.ArtistService):
 
     def GetArtists(self, request, target, **kwargs):
         artists = Artist.objects.filter(id__in=request.id)
+        if len(artists) == 0:
+            artists = Artist.objects.all()
         return artist_pb2.Artists(
             artists=[artist_pb2.Artist(id=artist.id, name=artist.name, no_plays=artist.NoPlays, user=artist.user)
                      for artist in artists])
