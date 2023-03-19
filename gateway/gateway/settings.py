@@ -14,7 +14,7 @@ ALLOWED_HOSTS = [
     'localhost',
     '0.0.0.0',
     '127.0.0.1'
-                 ]
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -61,8 +61,7 @@ ROOT_URLCONF = 'gateway.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': []
-        ,
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -89,6 +88,16 @@ SWAGGER_SETTINGS = {
       },
    }
 }
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': f'redis://:{os.environ.get("REDIS_PASS", "Mohammad@99")}'
+                    f'@{os.environ.get("REDIS", "localhost")}:6379',
+        'TIMEOUT': 86400
+    }
+}
+
 
 DATABASES = {
     'default': {
