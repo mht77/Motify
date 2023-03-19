@@ -1,10 +1,13 @@
+import uuid
+
 from django.db import models
 
 
 class Artist(models.Model):
     id = models.CharField(
         max_length=40,
-        primary_key=True
+        primary_key=True,
+        default=uuid.uuid4
     )
 
     name = models.CharField(
