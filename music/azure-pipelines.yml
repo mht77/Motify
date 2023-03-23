@@ -5,6 +5,7 @@ trigger:
   paths:
     include:
     - music
+    - protos
 
 resources:
 - repo: self

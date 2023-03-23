@@ -1,4 +1,6 @@
+import json
 import os
+from datetime import timedelta
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -12,7 +14,7 @@ ALLOWED_HOSTS = [
     'localhost',
     '0.0.0.0',
     '127.0.0.1'
-                 ]
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -24,7 +26,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
     'grpc_services',
-    'account'
+    'account',
+    'music',
 ]
 
 MIDDLEWARE = [
@@ -58,8 +61,7 @@ ROOT_URLCONF = 'gateway.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': []
-        ,
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -87,6 +89,16 @@ SWAGGER_SETTINGS = {
    }
 }
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': f'redis://:{os.environ.get("REDIS_PASS", "Mohammad@99")}'
+                    f'@{os.environ.get("REDIS", "localhost")}:6379',
+        'TIMEOUT': 86400
+    }
+}
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -107,6 +119,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}
+
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -124,3 +141,5 @@ GRPC_PORT = os.environ.get('GRPC_PORT', '50052')
 CLIENT_ID = '613574977749-5jbafsg1jvtmk7l6tc3o0u6b3til1nbv.apps.googleusercontent.com'
 
 RABBITMQ_HOST = os.environ.get('RABBITMQ_HOST', 'localhost')
+
+SERVICES = {'music': os.environ.get('MUSIC_SERVICE', 'localhost:50062')}
