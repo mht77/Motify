@@ -70,12 +70,14 @@ class Song(models.Model):
 
     date_added = models.DateTimeField(auto_now_add=True)
 
+    # length = models.PositiveIntegerField()
+
     @property
-    def length(self):
-        length = MP3(self.file.path).info.length
-        minutes = int(length / 60)
-        seconds = int(length % 60)
-        return f'{minutes}:{seconds}'
+    def path(self):
+        return self.file.path
 
     def __str__(self):
         return f'{self.artist.name}-{self.name}'
+
+
+# @pre_save

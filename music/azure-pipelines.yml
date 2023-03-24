@@ -27,7 +27,7 @@ stages:
   - job: Test
     displayName: Unit and Integration tests
     steps:
-    - script: docker run --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=postgres123motify -d postgres
+    - script: docker run --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=postgres123motify -e POSTGRES_DB=music -d postgres
       displayName: Run postgres container
     - script: docker run --name rabbitmq -p 5672:5672 -p 15672:15672  -d rabbitmq:3-management
       displayName: Run rabbitmq container
@@ -35,6 +35,7 @@ stages:
         pushd '$(Build.SourcesDirectory)/music'
         python -m pip install --upgrade pip setuptools wheel
         pip install -r requirements.txt
+        screen -S test -d -m ./run.sh
       displayName: 'Install prerequisites'
     - script: |
         pushd '$(Build.SourcesDirectory)/music'

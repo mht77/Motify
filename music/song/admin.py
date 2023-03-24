@@ -36,6 +36,7 @@ class SongAdmin(admin.ModelAdmin):
         'album',
         'no_plays',
         'date_added',
-        'length'
+        'path'
+        # 'length'
     ]
 
