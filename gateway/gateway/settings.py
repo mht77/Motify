@@ -13,7 +13,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '0.0.0.0',
-    '127.0.0.1'
+    '127.0.0.1',
+    '192.168.2.12'
 ]
 
 INSTALLED_APPS = [
@@ -25,6 +26,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'drf_yasg',
+    'corsheaders',
     'grpc_services',
     'account',
     'music',
@@ -32,6 +34,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -50,9 +53,11 @@ REST_FRAMEWORK = {
     )
 }
 
+CORS_ORIGIN_ALLOW_ALL = False
 
 CORS_ORIGIN_WHITELIST = (
-  'http://localhost',
+    'http://localhost:3000',
+    os.environ.get('WEB', 'http://localhost:3000')
 )
 
 
