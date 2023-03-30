@@ -16,7 +16,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '0.0.0.0',
-    '127.0.0.1'
+    os.environ.get('URL', '127.0.0.1'),
 ]
 
 # Application definition
@@ -28,12 +28,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'grpc_services',
     'artist',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -47,7 +49,7 @@ ROOT_URLCONF = 'music.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['user_player'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -76,10 +78,11 @@ DATABASES = {
     }
 }
 
-CORS_ORIGIN_WHITELIST = (
-  'http://localhost',
-)
+CORS_ORIGIN_ALLOW_ALL = False
 
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:3000',
+)
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
