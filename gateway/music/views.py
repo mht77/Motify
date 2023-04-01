@@ -13,11 +13,13 @@ from gateway.settings import SERVICES
 import artist_pb2
 import artist_pb2_grpc
 from music.serializers import ArtistSerializer
+from utils.cache_decorator import use_cache
 
 
 class ArtistsView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @use_cache
     def get(self, request, *args, **kwargs):
         with grpc.insecure_channel(SERVICES['music']) as channel:
             stub = artist_pb2_grpc.ArtistServiceStub(channel)
@@ -59,6 +61,7 @@ class ArtistView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @use_cache
     def get(self, request, pk=None, *args, **kwargs):
         if not pk:
             return Response(status=status.HTTP_400_BAD_REQUEST)
