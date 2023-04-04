@@ -80,5 +80,5 @@ stages:
         imageToDeploy: '$(containerRegistry)/$(imageRepository):$(tag)'
         containerAppName: 'motify-dev-music'
         resourceGroup: 'motify-dev'
-        containerAppEnvironment: 'motify-dev-managedEnvironment'
+        containerAppEnvironment: 'motify-dev-managed-environment'
         targetPort: '50061'
