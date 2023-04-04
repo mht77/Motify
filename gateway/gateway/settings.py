@@ -146,4 +146,6 @@ CLIENT_ID = '613574977749-5jbafsg1jvtmk7l6tc3o0u6b3til1nbv.apps.googleuserconten
 
 RABBITMQ_HOST = os.environ.get('RABBITMQ_HOST', 'localhost')
 
+CELERY_CACHE_BACKEND = 'default'
+
 SERVICES = {'music': os.environ.get('MUSIC_SERVICE', 'localhost:50062')}

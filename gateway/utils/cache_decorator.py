@@ -26,8 +26,8 @@ def use_cache(func):
         res.accepted_media_type = "application/json"
         res.renderer_context = {}
         res.render()
-        print(res)
         cache.set(key, res.data)
         return res
 
+    wrapper.__wrapped__ = func
     return wrapper

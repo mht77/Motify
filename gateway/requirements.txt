@@ -1,9 +1,15 @@
+amqp==5.1.1
 asgiref==3.6.0
 async-timeout==4.0.2
+billiard==3.6.4.0
 cachetools==5.3.0
+celery==5.2.7
 certifi==2022.12.7
 charset-normalizer==3.1.0
 click==8.1.3
+click-didyoumean==0.3.0
+click-plugins==1.1.1
+click-repl==0.2.0
 coreapi==2.3.3
 coreschema==0.0.4
 coverage==7.2.1
@@ -20,11 +26,13 @@ idna==3.4
 inflection==0.5.1
 itypes==1.2.0
 Jinja2==3.1.2
+kombu==5.2.4
 lxml==4.9.2
 MarkupSafe==2.1.2
 msgpack==1.0.5
 packaging==23.0
 pika==1.3.1
+prompt-toolkit==3.0.38
 protobuf==4.22.1
 psycopg2==2.9.5
 pyasn1==0.4.8
@@ -42,3 +50,5 @@ tabulate==0.9.0
 unittest-xml-reporting==3.2.0
 uritemplate==4.1.1
 urllib3==1.26.14
+vine==5.0.0
+wcwidth==0.2.6

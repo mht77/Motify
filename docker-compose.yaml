@@ -36,7 +36,7 @@ services:
     build:
       context: .
       dockerfile: gateway/Dockerfile
-#    command: sh -c "chmod +x ./run.sh && ./run.sh"
+    command: sh -c "python manage.py migrate && python manage.py grpcrunserver | python manage.py runserver 0.0.0.0:7777"
     container_name: gateway
     working_dir: /code/gateway/
     volumes:
@@ -57,6 +57,30 @@ services:
       - db
       - redis
       - rabbitmq
+    restart: on-failure
+
+  celery-worker-gateway:
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    command: celery -A gateway worker --loglevel=INFO
+    container_name: celery-worker-gateway
+    working_dir: /code/gateway/
+    volumes:
+      - ./gateway:/code/gateway/
+    environment:
+      - POSTGRES_NAME=gateway
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres123motify
+      - POSTGRES_HOST=db
+      - GRPC_PORT=50051
+      - RABBITMQ_HOST=rabbitmq
+      - REDIS=redis
+      - MUSIC_SERVICE=music:50061
+    depends_on:
+      - rabbitmq
+      - db
+      - gateway
     restart: on-failure
 
   music:
