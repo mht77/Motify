@@ -122,6 +122,7 @@ AZURE_STORAGE_CONTAINER = 'songs'
 if os.environ.get('Storage') == 'Azure':
     MEDIA_URL = f"https://{AZURE_STORAGE_NAME}.blob.core.windows.net/"
     DEFAULT_FILE_STORAGE = 'music.azure_storage.AzureStorage'
+    MEDIA_ROOT = MEDIA_URL + AZURE_STORAGE_CONTAINER
 else:
     MEDIA_URL = 'media/'
     # noinspection PyUnresolvedReferences
