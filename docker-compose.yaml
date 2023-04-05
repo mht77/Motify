@@ -36,7 +36,7 @@ services:
     build:
       context: .
       dockerfile: gateway/Dockerfile
-    command: sh -c "python manage.py migrate && python manage.py grpcrunserver | python manage.py runserver 0.0.0.0:7777"
+#    command: sh -c "python manage.py migrate && python manage.py grpcrunserver | python manage.py runserver 0.0.0.0:7777"
     container_name: gateway
     working_dir: /code/gateway/
     volumes:
