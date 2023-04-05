@@ -119,4 +119,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 GRPC_PORT = os.environ.get('GRPC_PORT', '50062')
 
+GRPC_ADDRESS = os.environ.get('GRPC_ADDRESS', '[::]')
+
 RABBITMQ_HOST = os.environ.get('RABBITMQ_HOST', 'localhost')

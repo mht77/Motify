@@ -27,7 +27,7 @@ stages:
   - job: Test
     displayName: Unit and Integration tests
     steps:
-    - script: docker run --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=postgres123motify -d postgres
+    - script: docker run --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=postgres123motify -e POSTGRES_DB=gateway -d postgres
       displayName: Run postgres container
     - script: docker run --name rabbitmq -p 5672:5672 -p 15672:15672  -d rabbitmq:3-management
       displayName: Run rabbitmq container
@@ -35,6 +35,7 @@ stages:
         pushd '$(Build.SourcesDirectory)/gateway'
         python -m pip install --upgrade pip setuptools wheel
         pip install -r requirements.txt
+        screen -S test -d -m ./run.sh
       displayName: 'Install prerequisites'
     - script: |
         pushd '$(Build.SourcesDirectory)/gateway'
@@ -45,6 +46,7 @@ stages:
       inputs:
         testResultsFormat: 'JUnit'
         testResultsFiles: '**/TEST-*.xml'
+        failTaskOnFailedTests: true
       condition: succeededOrFailed()
     - task: PublishCodeCoverageResults@1
       inputs:
@@ -67,3 +69,18 @@ stages:
         Dockerfile: '$(dockerfilePath)'
         buildContext: '$(Build.SourcesDirectory)'
         tags: '$(tag)'
+- stage: Deployment
+  displayName: Pull the name image in Container App
+  jobs:
+  - job: Deploy
+    displayName: Pull the name image in Container App
+    steps:
+    - task: AzureContainerApps@0
+      inputs:
+        azureSubscription: 'Motify'
+        acrName: 'motifybackend'
+        imageToDeploy: '$(containerRegistry)/$(imageRepository):$(tag)'
+        containerAppName: 'motify-dev-gateway'
+        resourceGroup: 'motify-dev'
+        containerAppEnvironment: 'motify-dev-managedEnvironment'
+        targetPort: '7777'
