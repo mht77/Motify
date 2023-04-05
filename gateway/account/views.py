@@ -1,22 +1,19 @@
-import json
-
+import requests
 from django.contrib.auth.models import User
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from google.auth.transport import requests as google_requests
+from google.oauth2 import id_token
 from rest_framework import status
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import AccessToken
 
-from gateway import settings
 from account.serializers import AccountSerializer, UserOutputSerializer, UserInputSerializer, UserUpdateSerializer
-
-import requests
-from drf_yasg import openapi
-
-from google.oauth2 import id_token
-from rest_framework.decorators import action
-from google.auth.transport import requests as google_requests
+from gateway import settings
+from utils.cache_decorator import use_cache
 
 
 # noinspection PyMethodMayBeStatic
@@ -33,6 +30,7 @@ class UserView(APIView):
             # Allow all other requests (e.g. POST) without authentication
             return [AllowAny()]
 
+    @use_cache
     def get(self, request):
         """
         Return the details of the authenticated user
@@ -72,6 +70,7 @@ class AccountView(APIView):
         if self.request.method in ['GET', 'PUT']:
             return [IsAuthenticated()]
 
+    @use_cache
     def get(self, request):
         """
         Return the account of the authenticated user
