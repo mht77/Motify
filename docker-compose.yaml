@@ -67,6 +67,7 @@ services:
     working_dir: /code/music/
     volumes:
       - ./music:/code/music/
+      - ~/motify/data/songs:/data/songs/
     ports:
       - "7778:7778"
       - "50061:50061"
@@ -83,3 +84,6 @@ services:
       - redis
       - rabbitmq
     restart: on-failure
+
+volumes:
+  songs:

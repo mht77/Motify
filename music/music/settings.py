@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'grpc_services',
     'artist',
+    'song',
 ]
 
 MIDDLEWARE = [
@@ -112,10 +113,19 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AZURE_STORAGE_NAME = 'motifyfiles'
+
+AZURE_STORAGE_CONTAINER = 'songs'
+
+if os.environ.get('Storage') == 'Azure':
+    MEDIA_URL = f"https://{AZURE_STORAGE_NAME}.blob.core.windows.net/"
+    DEFAULT_FILE_STORAGE = 'music.azure_storage.AzureStorage'
+else:
+    MEDIA_URL = 'media/'
+    # noinspection PyUnresolvedReferences
+    MEDIA_ROOT = '../../data/songs/'
 
 GRPC_PORT = os.environ.get('GRPC_PORT', '50062')
 

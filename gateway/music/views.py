@@ -36,10 +36,9 @@ class ArtistsView(APIView):
 
     @swagger_auto_schema(request_body=ArtistSerializer)
     def post(self, request, *args, **kwargs):
-        try:
-            artist = artist_pb2.Artist(name=request.data['name'], user=request.data['user'])
-        except KeyError:
-            return Response(data="missing property", status=status.HTTP_400_BAD_REQUEST)
+        serializer = ArtistSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        artist = artist_pb2.Artist(name=request.data['name'], user=request.data['user'])
         with grpc.insecure_channel(SERVICES['music']) as channel:
             stub = artist_pb2_grpc.ArtistServiceStub(channel)
             try:
