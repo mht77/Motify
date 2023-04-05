@@ -29,5 +29,4 @@ def use_cache(func):
         cache.set(key, res.data)
         return res
 
-    wrapper.__wrapped__ = func
     return wrapper

@@ -59,29 +59,29 @@ services:
       - rabbitmq
     restart: on-failure
 
-  celery-worker-gateway:
-    build:
-      context: .
-      dockerfile: gateway/Dockerfile
-    command: celery -A gateway worker --loglevel=INFO
-    container_name: celery-worker-gateway
-    working_dir: /code/gateway/
-    volumes:
-      - ./gateway:/code/gateway/
-    environment:
-      - POSTGRES_NAME=gateway
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres123motify
-      - POSTGRES_HOST=db
-      - GRPC_PORT=50051
-      - RABBITMQ_HOST=rabbitmq
-      - REDIS=redis
-      - MUSIC_SERVICE=music:50061
-    depends_on:
-      - rabbitmq
-      - db
-      - gateway
-    restart: on-failure
+#  celery-worker-gateway:
+#    build:
+#      context: .
+#      dockerfile: gateway/Dockerfile
+#    command: celery -A gateway worker --loglevel=INFO
+#    container_name: celery-worker-gateway
+#    working_dir: /code/gateway/
+#    volumes:
+#      - ./gateway:/code/gateway/
+#    environment:
+#      - POSTGRES_NAME=gateway
+#      - POSTGRES_USER=postgres
+#      - POSTGRES_PASSWORD=postgres123motify
+#      - POSTGRES_HOST=db
+#      - GRPC_PORT=50051
+#      - RABBITMQ_HOST=rabbitmq
+#      - REDIS=redis
+#      - MUSIC_SERVICE=music:50061
+#    depends_on:
+#      - rabbitmq
+#      - db
+#      - gateway
+#    restart: on-failure
 
   music:
     build:

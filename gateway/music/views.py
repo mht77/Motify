@@ -1,4 +1,5 @@
 import grpc
+from django.core.cache import cache
 from drf_yasg.utils import swagger_auto_schema
 from google.protobuf.json_format import MessageToDict
 from rest_framework import status
@@ -48,6 +49,7 @@ class ArtistsView(APIView):
                 res = stub.CreateArtist(artist)
                 artist = MessageToDict(res)
                 artist['account'] = AccountSerializer(Account.objects.get(id=artist['user'])).data
+                cache.delete(f'get{self.__class__.__name__}')
                 return Response(data=artist, status=status.HTTP_201_CREATED)
             except grpc.RpcError as e:
                 print(e)
