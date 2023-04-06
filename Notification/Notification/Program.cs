@@ -10,10 +10,10 @@ if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
     builder.WebHost.ConfigureKestrel(options =>
     {
         // Setup a HTTP/2 endpoint without TLS.
-        options.ListenLocalhost(5038, o => o.Protocols = HttpProtocols.Http2);
+        // options.ListenLocalhost(5038, o => o.Protocols = HttpProtocols.Http2);
+        options.ListenAnyIP(5038, o => o.Protocols = HttpProtocols.Http2);
     });
 
-Console.WriteLine(builder.Configuration.GetConnectionString("Default"));
 builder.Services.AddDbContext<ApplicationDBContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 builder.Services.AddGrpc();
