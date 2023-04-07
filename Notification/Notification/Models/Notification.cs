@@ -6,11 +6,12 @@ public class Notification: ModelBase
     
     public DateTime CreatedAt { get; set; }
 
-    public string User { get; set; } = null!;
+    public string User { get; set; }
 
-    public Notification(string message)
+    public Notification(string message, string user)
     {
         Message = message;
-        CreatedAt = DateTime.Now;
+        CreatedAt = DateTime.UtcNow;
+        User = user;
     }
 }

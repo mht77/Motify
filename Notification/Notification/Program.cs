@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Notification.Repositories;
 using Notification.Services;
+using Notification.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,8 @@ builder.Services.AddDbContext<ApplicationDBContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 builder.Services.AddGrpc();
 builder.Services.AddTransient<IRepository<Notification.Models.Notification>, NotificationRepository>();
+builder.Services.AddTransient<INotificationService, NotificationService>();
+builder.Services.AddSingleton<IRabbitMQConnection, RabbitMQConnection>();
 
 var app = builder.Build();
 
@@ -29,9 +32,9 @@ app.MapGet("/",
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
-    // var rabbit = scope.ServiceProvider.GetRequiredService<IRabbitMQConnection>();
-    // rabbit.StartConsuming();
     db.Database.Migrate();
+    var rabbit = scope.ServiceProvider.GetRequiredService<IRabbitMQConnection>();
+    rabbit.StartConsuming();
 }
 
 app.Run();

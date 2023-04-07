@@ -94,6 +94,7 @@ services:
       - "5038:5038"
     environment:
       - ConnectionStrings:Default=Host=db;Database=notification;Username=postgres;Password=postgres123motify;Integrated Security=true;Pooling=true;
+      - RabbitMQ=rabbitmq
     depends_on:
       - db
       - rabbitmq
