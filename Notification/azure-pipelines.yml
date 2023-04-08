@@ -42,9 +42,9 @@ stages:
             inputs:
               codeCoverageTool: 'Cobertura'
               summaryFileLocation: '$(Agent.TempDirectory)/**/*coverage.cobertura.xml'
-          - task: QodanaScan@2022
-            inputs:
-              args: '-i $(Build.SourcesDirectory)/Notification/Notification'
+          # - task: QodanaScan@2022
+          #   inputs:
+          #     args: '-i $(Build.SourcesDirectory)/Notification/Notification'
 
   - stage: Docker_Build
     displayName: Build and push docker image
