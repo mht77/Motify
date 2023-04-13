@@ -35,14 +35,16 @@ stages:
             inputs:
               command: 'test'
               publishTestResults: true
-              projects: '$(Build.SourcesDirectory)/Notification/'
+              projects: '**/NotificationTest.csproj'
               arguments: '--collect "XPlat Code coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura'
             displayName: 'Run tests'
           - task: PublishCodeCoverageResults@1
             inputs:
               codeCoverageTool: 'Cobertura'
-              summaryFileLocation: '$(Build.SourcesDirectory)/Notification/**/coverage.cobertura.xml'
-          - task: QodanaScan@2022
+              summaryFileLocation: '$(Agent.TempDirectory)/**/*coverage.cobertura.xml'
+          # - task: QodanaScan@2022
+          #   inputs:
+          #     args: '-i $(Build.SourcesDirectory)/Notification/Notification'
 
   - stage: Docker_Build
     displayName: Build and push docker image
