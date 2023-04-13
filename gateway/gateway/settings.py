@@ -148,4 +148,7 @@ RABBITMQ_HOST = os.environ.get('RABBITMQ_HOST', 'localhost')
 
 CELERY_CACHE_BACKEND = 'default'
 
-SERVICES = {'music': os.environ.get('MUSIC_SERVICE', 'localhost:50062')}
+SERVICES = {
+    'music': os.environ.get('MUSIC_SERVICE', 'localhost:50062'),
+    'notification': os.environ.get('NOTIFICATION_SERVICE', 'localhost:5038'),
+}

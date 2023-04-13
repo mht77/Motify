@@ -36,7 +36,7 @@ services:
     build:
       context: .
       dockerfile: gateway/Dockerfile
-#    command: sh -c "python manage.py migrate && python manage.py grpcrunserver | python manage.py runserver 0.0.0.0:7777"
+#    command: sh -c "chmod +x ./run.sh && ./run.sh"
     container_name: gateway
     working_dir: /code/gateway/
     volumes:
@@ -53,6 +53,7 @@ services:
       - RABBITMQ_HOST=rabbitmq
       - REDIS=redis
       - MUSIC_SERVICE=music:50061
+      - NOTIFICATION_SERVICE=notification:5038
     depends_on:
       - db
       - redis
@@ -106,6 +107,21 @@ services:
     depends_on:
       - db
       - redis
+      - rabbitmq
+    restart: on-failure
+
+  notification:
+    build:
+      context: .
+      dockerfile: Notification/Notification/Dockerfile
+    container_name: notification
+    ports:
+      - "5038:5038"
+    environment:
+      - ConnectionStrings:Default=Host=db;Database=notification;Username=postgres;Password=postgres123motify;Integrated Security=true;Pooling=true;
+      - RabbitMQ=rabbitmq
+    depends_on:
+      - db
       - rabbitmq
     restart: on-failure
 

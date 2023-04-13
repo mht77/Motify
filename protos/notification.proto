@@ -1,0 +1,20 @@
+syntax = 'proto3';
+
+package motify.notification;
+
+option csharp_namespace = "Notification";
+
+
+service NotificationService{
+  rpc GetNotifications(NotificationRequest) returns (stream NotificationResponse);
+}
+
+
+message NotificationRequest{
+  string id = 1;
+}
+
+message NotificationResponse{
+  string msg = 1;
+  string created_at = 2;
+}
