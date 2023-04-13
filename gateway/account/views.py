@@ -13,7 +13,6 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from account.serializers import AccountSerializer, UserOutputSerializer, UserInputSerializer, UserUpdateSerializer
 from gateway import settings
-from utils.cache_decorator import use_cache
 
 
 # noinspection PyMethodMayBeStatic
@@ -30,7 +29,6 @@ class UserView(APIView):
             # Allow all other requests (e.g. POST) without authentication
             return [AllowAny()]
 
-    @use_cache
     def get(self, request):
         """
         Return the details of the authenticated user
@@ -70,7 +68,6 @@ class AccountView(APIView):
         if self.request.method in ['GET', 'PUT']:
             return [IsAuthenticated()]
 
-    @use_cache
     def get(self, request):
         """
         Return the account of the authenticated user
