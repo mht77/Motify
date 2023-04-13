@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'grpc_services',
     'artist',
     'song',
+    'user_player'
 ]
 
 MIDDLEWARE = [
@@ -50,7 +51,7 @@ ROOT_URLCONF = 'music.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['user_player'],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
