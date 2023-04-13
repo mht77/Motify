@@ -53,11 +53,36 @@ services:
       - RABBITMQ_HOST=rabbitmq
       - REDIS=redis
       - MUSIC_SERVICE=music:50061
+      - NOTIFICATION_SERVICE=notification:5038
     depends_on:
       - db
       - redis
       - rabbitmq
     restart: on-failure
+
+#  celery-worker-gateway:
+#    build:
+#      context: .
+#      dockerfile: gateway/Dockerfile
+#    command: celery -A gateway worker --loglevel=INFO
+#    container_name: celery-worker-gateway
+#    working_dir: /code/gateway/
+#    volumes:
+#      - ./gateway:/code/gateway/
+#    environment:
+#      - POSTGRES_NAME=gateway
+#      - POSTGRES_USER=postgres
+#      - POSTGRES_PASSWORD=postgres123motify
+#      - POSTGRES_HOST=db
+#      - GRPC_PORT=50051
+#      - RABBITMQ_HOST=rabbitmq
+#      - REDIS=redis
+#      - MUSIC_SERVICE=music:50061
+#    depends_on:
+#      - rabbitmq
+#      - db
+#      - gateway
+#    restart: on-failure
 
   music:
     build:
@@ -67,6 +92,7 @@ services:
     working_dir: /code/music/
     volumes:
       - ./music:/code/music/
+      - ~/motify/data/songs:/data/songs/
     ports:
       - "7778:7778"
       - "50061:50061"
@@ -83,3 +109,21 @@ services:
       - redis
       - rabbitmq
     restart: on-failure
+
+  notification:
+    build:
+      context: .
+      dockerfile: Notification/Notification/Dockerfile
+    container_name: notification
+    ports:
+      - "5038:5038"
+    environment:
+      - ConnectionStrings:Default=Host=db;Database=notification;Username=postgres;Password=postgres123motify;Integrated Security=true;Pooling=true;
+      - RabbitMQ=rabbitmq
+    depends_on:
+      - db
+      - rabbitmq
+    restart: on-failure
+
+volumes:
+  songs:
