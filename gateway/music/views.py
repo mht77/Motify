@@ -99,7 +99,7 @@ class SearchView(APIView):
         except KeyError:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         with grpc.insecure_channel(SERVICES['music']) as channel:
-            stub = song_pb2_grpc.SearchServiceStub(channel)
+            stub = song_pb2_grpc.SongServiceStub(channel)
             try:
                 res = stub.Find(song_pb2.SearchRequest(keyword=keyword))
                 songs = MessageToDict(res)['songs']
@@ -107,6 +107,8 @@ class SearchView(APIView):
             except grpc.RpcError as e:
                 logging.error(e)
                 return Response(status=status.HTTP_400_BAD_REQUEST)
+            except KeyError:
+                return Response(status=status.HTTP_404_NOT_FOUND)
             except Exception as e:
                 logging.error(e)
                 return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)

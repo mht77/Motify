@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package motify.music;
 
-service SearchService {
+service SongService {
   rpc Find(SearchRequest) returns (SearchResponse) {}
 }
 
@@ -21,4 +21,5 @@ message Song{
   string album = 4;
   string genre = 5;
   string date_added = 6;
+  string file = 7;
 }
