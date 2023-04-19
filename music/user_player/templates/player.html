@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Music Player</title>
+    <style>
+        .music-player {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: transparent;
+            color: white;
+            height: 1rem;
+        }
+        .music-player h2 {
+        }
+        .music-player button {
+            padding: 10px;
+            border: none;
+            border-radius: 50%;
+            background-color: #4c93af;
+            color: white;
+            cursor: pointer;
+            width: max-content;
+        }
+        .music-player button:hover {
+            background-color: #358fb2;
+        }
+    </style>
+</head>
+<body>
+    <div class="music-player">
+        <h3>{{ song.name }}</h3> &nbsp; &nbsp; &nbsp;
+        <button id="play_btn" onclick="playPause()"></button> &nbsp; &nbsp; &nbsp;
+        <h5>by {{ song.artist.name }}</h5>
+    </div>
+
+    <script>
+        let audio = new Audio('{{ song.file.url }}');
+
+        let btn_text = '>';
+        document.getElementById('play_btn').innerHTML = btn_text;
+
+        function playPause() {
+            if (audio.paused) {
+                audio.play();
+                btn_text = '||';
+                fetch('/song/', {
+                    method: 'POST',
+                    body: JSON.stringify({song: '{{ song.id }}'}),
+                    headers: {
+                          "Content-Type": "application/json",
+                        },
+                });
+            } else {
+                audio.pause();
+                btn_text = '>';
+            }
+            document.getElementById('play_btn').innerHTML = btn_text;
+        }
+    </script>
+</body>
+</html>

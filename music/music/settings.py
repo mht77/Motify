@@ -17,6 +17,7 @@ ALLOWED_HOSTS = [
     'localhost',
     '0.0.0.0',
     os.environ.get('URL', '127.0.0.1'),
+    os.environ.get('WEB', 'http://localhost:3000')
 ]
 
 # Application definition
@@ -51,7 +52,7 @@ ROOT_URLCONF = 'music.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['user_player'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -83,7 +84,7 @@ DATABASES = {
 CORS_ORIGIN_ALLOW_ALL = False
 
 CORS_ORIGIN_WHITELIST = (
-    'http://localhost:3000',
+    os.environ.get('WEB', 'http://localhost:3000')
 )
 
 # Password validation
