@@ -34,3 +34,13 @@ class UserCreatedEvent(Producer):
         self.channel.basic_publish(exchange='user-created', routing_key='', body=msgpack.packb(account))
         self.channel.close()
         self.connection.close()
+
+
+class UserLoggedIn(Producer):
+    """
+    send user created msg on the fanout exchange
+    """
+    def call(self, device):
+        self.channel.basic_publish(exchange='', routing_key='user_logged_in', body=msgpack.packb(device))
+        self.channel.close()
+        self.connection.close()
