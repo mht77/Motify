@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package motify.playlist;
+
+option go_package = "/playlist/services/";
+
+service PlaylistService{
+  rpc Create(CreateRequest) returns (CreateResponse){}
+  rpc Delete(SongId) returns (SongId){}
+  rpc GetById(SongId) returns (CreateResponse){}
+  rpc GetAll(UserId) returns (GetAllResponse){}
+}
+
+message CreateRequest{
+  string user = 1;
+  string name = 2;
+  repeated string songs = 3;
+}
+
+message CreateResponse{
+  string id = 1;
+  string name = 2;
+  string user = 3;
+  repeated string songs = 4;
+  string date_created = 5;
+}
+
+message GetAllResponse{
+  repeated CreateResponse playlists = 1;
+}
+
+message UserId{
+  string id = 1;
+}
+
+message SongId{
+  string id = 1;
+}
