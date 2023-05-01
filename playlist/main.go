@@ -32,6 +32,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+	go StartListening(repositories.CreatePlaylistRepository(db))
 	s := grpc.NewServer()
 	service := services.CreatePlaylistService(repositories.CreatePlaylistRepository(db))
 	services.RegisterPlaylistServiceServer(s, service)

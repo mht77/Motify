@@ -30,7 +30,7 @@ class UserCreatedEvent(Producer):
     send user created msg on the fanout exchange
     """
     def call(self, account):
-        self.channel.exchange_declare(exchange='user-created', exchange_type='fanout')
+        self.channel.exchange_declare(exchange='user-created', exchange_type='fanout', durable=True)
         self.channel.basic_publish(exchange='user-created', routing_key='', body=msgpack.packb(account))
         self.channel.close()
         self.connection.close()
