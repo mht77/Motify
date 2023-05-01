@@ -148,7 +148,7 @@ GitHub.sublime-settings
 celerybeat-schedule
 
 **pb2**
-**/*pb.go
+#**/*pb.go
 
 *.user
 /playlist/playlist
