@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"log"
 	"playlist/models"
+	"playlist/services/proto"
 	"time"
 )
 
@@ -19,13 +20,14 @@ type PlaylistRepository interface {
 
 type PlaylistService struct {
 	PlaylistRepository PlaylistRepository
+	proto.UnimplementedPlaylistServiceServer
 }
 
 func CreatePlaylistService(playlistRepository PlaylistRepository) *PlaylistService {
 	return &PlaylistService{PlaylistRepository: playlistRepository}
 }
 
-func (service *PlaylistService) Create(_ context.Context, request *CreateRequest) (*CreateResponse, error) {
+func (service *PlaylistService) Create(_ context.Context, request *proto.CreateRequest) (*proto.CreateResponse, error) {
 	log.Printf("Received from user: %s, name: %s", request.User, request.Name)
 	playlist := models.Playlist{}
 	playlist.Name = request.Name
@@ -38,7 +40,7 @@ func (service *PlaylistService) Create(_ context.Context, request *CreateRequest
 	if err != nil {
 		return nil, err
 	}
-	return &CreateResponse{
+	return &proto.CreateResponse{
 		Id:          created.Id,
 		User:        created.User,
 		Name:        created.Name,
@@ -47,20 +49,20 @@ func (service *PlaylistService) Create(_ context.Context, request *CreateRequest
 	}, nil
 }
 
-func (service *PlaylistService) Delete(_ context.Context, request *SongId) (*SongId, error) {
+func (service *PlaylistService) Delete(_ context.Context, request *proto.SongId) (*proto.SongId, error) {
 	err := service.PlaylistRepository.Delete(request.Id)
 	if err != nil {
 		return nil, err
 	}
-	return &SongId{Id: request.Id}, nil
+	return &proto.SongId{Id: request.Id}, nil
 }
 
-func (service *PlaylistService) GetById(_ context.Context, request *SongId) (*CreateResponse, error) {
+func (service *PlaylistService) GetById(_ context.Context, request *proto.SongId) (*proto.CreateResponse, error) {
 	playlist, err := service.PlaylistRepository.GetById(request.Id)
 	if err != nil {
 		return nil, err
 	}
-	return &CreateResponse{
+	return &proto.CreateResponse{
 		Id:          playlist.Id,
 		User:        playlist.User,
 		Name:        playlist.Name,
@@ -69,14 +71,14 @@ func (service *PlaylistService) GetById(_ context.Context, request *SongId) (*Cr
 	}, nil
 }
 
-func (service *PlaylistService) GetAll(_ context.Context, request *UserId) (*GetAllResponse, error) {
+func (service *PlaylistService) GetAll(_ context.Context, request *proto.UserId) (*proto.GetAllResponse, error) {
 	playlists, err := service.PlaylistRepository.GetAll(request.Id)
 	if err != nil {
 		return nil, err
 	}
-	playlistResponses := make([]*CreateResponse, 0)
+	playlistResponses := make([]*proto.CreateResponse, 0)
 	for _, playlist := range *playlists {
-		playlistResponses = append(playlistResponses, &CreateResponse{
+		playlistResponses = append(playlistResponses, &proto.CreateResponse{
 			Id:          playlist.Id,
 			User:        playlist.User,
 			Name:        playlist.Name,
@@ -84,11 +86,7 @@ func (service *PlaylistService) GetAll(_ context.Context, request *UserId) (*Get
 			Songs:       SongIdsFromSongModels(playlist.Songs),
 		})
 	}
-	return &GetAllResponse{Playlists: playlistResponses}, nil
-}
-
-func (*PlaylistService) mustEmbedUnimplementedPlaylistServiceServer() {
-	panic("implement me")
+	return &proto.GetAllResponse{Playlists: playlistResponses}, nil
 }
 
 type SongRepository interface {

@@ -11,6 +11,7 @@ import (
 	"playlist/models"
 	"playlist/repositories"
 	"playlist/services"
+	"playlist/services/proto"
 )
 
 func main() {
@@ -35,7 +36,7 @@ func main() {
 	go StartListening(repositories.CreatePlaylistRepository(db))
 	s := grpc.NewServer()
 	service := services.CreatePlaylistService(repositories.CreatePlaylistRepository(db))
-	services.RegisterPlaylistServiceServer(s, service)
+	proto.RegisterPlaylistServiceServer(s, service)
 	log.Printf("server listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)

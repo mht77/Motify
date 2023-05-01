@@ -4,7 +4,7 @@
 // - protoc             v3.21.12
 // source: playlist.proto
 
-package services
+package proto
 
 import (
 	context "context"
