@@ -32,9 +32,12 @@ stages:
         go test ./... -v -cover -coverprofile=coverage.out
         go tool cover -html=coverage.out -o coverage.html
       displayName: Run unit tests & Generate coverage report
-    - task: PublishCodeCoverageResults@2
+    - task: PublishCodeCoverageResults@1
       inputs:
-        summaryFileLocation: '**/*coverage.html'
+        codeCoverageTool: 'Cobertura'
+        summaryFileLocation: '$(Build.SourcesDirectory)/playlist/*coverage.html'
+        reportDirectory: '$(Build.SourcesDirectory)/playlist/'
+        additionalCodeCoverageFiles: '$(Build.SourcesDirectory)/playlist/*coverage.html'
 - stage: Docker_Build
   displayName: Build and push docker image
   jobs:
