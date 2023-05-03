@@ -81,7 +81,8 @@ pip-delete-this-directory.txt
 # Unit test / coverage reports 
 htmlcov/ 
 .tox/ 
-.coverage 
+.coverage
+**/coverage*
 .coverage.* 
 .cache 
 .pytest_cache/ 
@@ -90,6 +91,7 @@ coverage.xml
 *.cover 
 .hypothesis/
 TEST*.xml
+**/report.xml
 
 # Jupyter Notebook 
 .ipynb_checkpoints 

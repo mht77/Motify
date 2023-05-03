@@ -4,14 +4,14 @@ trigger:
       - main
   paths:
     include:
-    - playlist
-    - protos
+      - playlist
+      - protos
 
 resources:
-- repo: self
+  - repo: self
 
-pool: 
-   vmImage: ubuntu-latest
+pool:
+  vmImage: ubuntu-latest
 
 variables:
   dockerRegistryServiceConnection: 'a4d10f07-2d31-481c-9fc0-77de7e0a6cd2'
@@ -21,47 +21,65 @@ variables:
   tag: '$(Build.BuildId)'
 
 stages:
-- stage: Test
-  displayName: Run different types of test
-  jobs:
-  - job: Test
-    displayName: Unit and Integration tests
-    steps:
-    - task: GoTool@0
-      inputs:
-        version: '1.20.3'
-    - task: Go@0
-      inputs:
-        command: 'test'
-        arguments: './... -v -cover -coverprofile=coverage.txt'
-        workingDirectory: '$(Build.SourcesDirectory)/playlist'
-- stage: Docker_Build
-  displayName: Build and push docker image
-  jobs:
-  - job: Build
-    displayName: Build docker image
-    steps:
-    - task: Docker@2
-      displayName: Build and push an image to container registry
-      inputs:
-        containerRegistry: '$(dockerRegistryServiceConnection)'
-        repository: '$(imageRepository)'
-        command: 'buildAndPush'
-        Dockerfile: '$(dockerfilePath)'
-        buildContext: '$(Build.SourcesDirectory)'
-        tags: '$(tag)'
-- stage: Deployment
-  displayName: Pull the name image in Container App
-  jobs:
-  - job: Deploy
+  - stage: Test
+    displayName: Run different types of test
+    jobs:
+      - job: Test
+        displayName: Unit and Integration tests
+        steps:
+          - task: GoTool@0
+            inputs:
+              version: '1.20.3'
+          - script: |
+             pushd '$(Build.SourcesDirectory)/playlist' 
+             go get -u github.com/jstemmer/go-junit-report
+             go get -u github.com/axw/gocov/gocov
+             go get -u github.com/AlekSi/gocov-xml
+             go install github.com/jstemmer/go-junit-report
+             go install github.com/axw/gocov/gocov
+             go install github.com/AlekSi/gocov-xml
+             go test ./... -v -cover -coverprofile=coverage.txt | go-junit-report > report.xml
+             gocov convert coverage.txt > coverage.json
+             gocov-xml < coverage.json > coverage.xml
+            displayName: Run unit tests & Generate coverage report
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '*report*.xml'
+              searchFolder: '$(Build.SourcesDirectory)/playlist'
+            displayName: 'Publish test results'
+          - task: PublishCodeCoverageResults@1
+            inputs:
+              codeCoverageTool: 'Cobertura'
+              summaryFileLocation: '$(Build.SourcesDirectory)/playlist/coverage.xml'
+            displayName: 'Publish code coverage results'
+  - stage: Docker_Build
+    displayName: Build and push docker image
+    jobs:
+      - job: Build
+        displayName: Build docker image
+        steps:
+          - task: Docker@2
+            displayName: Build and push an image to container registry
+            inputs:
+              containerRegistry: '$(dockerRegistryServiceConnection)'
+              repository: '$(imageRepository)'
+              command: 'buildAndPush'
+              Dockerfile: '$(dockerfilePath)'
+              buildContext: '$(Build.SourcesDirectory)'
+              tags: '$(tag)'
+  - stage: Deployment
     displayName: Pull the name image in Container App
-    steps:
-    - task: AzureContainerApps@0
-      inputs:
-        azureSubscription: 'Motify'
-        acrName: 'motifybackend'
-        imageToDeploy: '$(containerRegistry)/$(imageRepository):$(tag)'
-        containerAppName: 'motify-dev-playlist'
-        resourceGroup: 'motify-dev'
-        containerAppEnvironment: 'motify-dev-managed-environment'
-        targetPort: '60051'
+    jobs:
+      - job: Deploy
+        displayName: Pull the name image in Container App
+        steps:
+          - task: AzureContainerApps@0
+            inputs:
+              azureSubscription: 'Motify'
+              acrName: 'motifybackend'
+              imageToDeploy: '$(containerRegistry)/$(imageRepository):$(tag)'
+              containerAppName: 'motify-dev-playlist'
+              resourceGroup: 'motify-dev'
+              containerAppEnvironment: 'motify-dev-managed-environment'
+              targetPort: '60051'
