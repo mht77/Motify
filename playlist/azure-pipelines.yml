@@ -27,10 +27,11 @@ stages:
   - job: Test
     displayName: Unit and Integration tests
     steps:
-    - script: go test ./... -v -cover -coverprofile=coverage.out
-      displayName: Run unit tests
-    - script: go tool cover -html=coverage.out -o coverage.html
-      displayName: Generate coverage report
+    - script: |
+        pushd '$(Build.SourcesDirectory)/playlist'
+        go test ./... -v -cover -coverprofile=coverage.out
+        go tool cover -html=coverage.out -o coverage.html
+      displayName: Run unit tests & Generate coverage report
     - task: PublishCodeCoverageResults@2
       inputs:
         summaryFileLocation: '**/*coverage.html'
