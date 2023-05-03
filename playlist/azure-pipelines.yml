@@ -1,0 +1,66 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+    - playlist
+    - protos
+
+resources:
+- repo: self
+
+pool: 
+   vmImage: ubuntu-latest
+
+variables:
+  dockerRegistryServiceConnection: 'a4d10f07-2d31-481c-9fc0-77de7e0a6cd2'
+  imageRepository: 'motifyplaylist'
+  containerRegistry: 'motifybackend.azurecr.io'
+  dockerfilePath: '$(Build.SourcesDirectory)/playlist/Dockerfile'
+  tag: '$(Build.BuildId)'
+
+stages:
+- stage: Test
+  displayName: Run different types of test
+  jobs:
+  - job: Test
+    displayName: Unit and Integration tests
+    steps:
+    - script: go test ./... -v -cover -coverprofile=coverage.out
+      displayName: Run unit tests
+    - script: go tool cover -html=coverage.out -o coverage.html
+      displayName: Generate coverage report
+    - task: PublishCodeCoverageResults@2
+      inputs:
+        summaryFileLocation: '**/*coverage.html'
+- stage: Docker_Build
+  displayName: Build and push docker image
+  jobs:
+  - job: Build
+    displayName: Build docker image
+    steps:
+    - task: Docker@2
+      displayName: Build and push an image to container registry
+      inputs:
+        containerRegistry: '$(dockerRegistryServiceConnection)'
+        repository: '$(imageRepository)'
+        command: 'buildAndPush'
+        Dockerfile: '$(dockerfilePath)'
+        buildContext: '$(Build.SourcesDirectory)'
+        tags: '$(tag)'
+- stage: Deployment
+  displayName: Pull the name image in Container App
+  jobs:
+  - job: Deploy
+    displayName: Pull the name image in Container App
+    steps:
+    - task: AzureContainerApps@0
+      inputs:
+        azureSubscription: 'Motify'
+        acrName: 'motifybackend'
+        imageToDeploy: '$(containerRegistry)/$(imageRepository):$(tag)'
+        containerAppName: 'motify-dev-playlist'
+        resourceGroup: 'motify-dev'
+        containerAppEnvironment: 'motify-dev-managed-environment'
+        targetPort: '60051'
