@@ -31,11 +31,11 @@ stages:
       inputs:
         version: '1.20'
     - script: |
-        pushd '$(Build.SourcesDirectory)/playlist'
-        go get -u github.com/jstemmer/go-junit-report
-        go get -u github.com/axw/gocov/gocov
-        go get -u github.com/AlekSi/gocov-xml
-        go test ./... -v -cover -coverprofile=coverage.txt | $HOME/go/bin/go-junit-report > report.xml
+        pushd '$(Build.SourcesDirectory)/playlist' 
+        go get -u github.com/jstemmer/go-junit-report 2>&1
+        go get -u github.com/axw/gocov/gocov 2>&1
+        go get -u github.com/AlekSi/gocov-xml 2>&1
+        go test ./... -v -cover -coverprofile=coverage.txt 2>&1 | $HOME/go/bin/go-junit-report > report.xml
         $HOME/go/bin/gocov convert coverage.txt > coverage.json
         $HOME/go/bin/gocov-xml < coverage.json > coverage.xml
       displayName: Run unit tests & Generate coverage report
