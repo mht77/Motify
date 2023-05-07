@@ -17,6 +17,7 @@ ALLOWED_HOSTS = [
     'localhost',
     '0.0.0.0',
     os.environ.get('URL', '127.0.0.1'),
+    os.environ.get('WEB', 'http://localhost:3000')
 ]
 
 # Application definition
@@ -32,6 +33,7 @@ INSTALLED_APPS = [
     'grpc_services',
     'artist',
     'song',
+    'user_player'
 ]
 
 MIDDLEWARE = [
@@ -81,9 +83,9 @@ DATABASES = {
 
 CORS_ORIGIN_ALLOW_ALL = False
 
-CORS_ORIGIN_WHITELIST = (
-    'http://localhost:3000',
-)
+CORS_ORIGIN_WHITELIST = [
+    os.environ.get('WEB', 'http://localhost')
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators

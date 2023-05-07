@@ -125,5 +125,28 @@ services:
       - rabbitmq
     restart: on-failure
 
+  playlist:
+    build:
+      context: .
+      dockerfile: playlist/Dockerfile
+    container_name: playlist
+    working_dir: /code/playlist/
+    volumes:
+      - ./playlist:/code/playlist/
+    ports:
+      - "60051:60051"
+    environment:
+      - DB_NAME=playlist
+      - DB_USER=postgres
+      - DB_PASS=postgres123motify
+      - DB_HOST=db
+      - RABBITMQ_HOST=rabbitmq
+      - GRPC_PORT=60051
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
+    restart: on-failure
+
 volumes:
   songs:
