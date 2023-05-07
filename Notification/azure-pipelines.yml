@@ -61,3 +61,18 @@ stages:
               Dockerfile: '$(dockerfilePath)'
               buildContext: '$(Build.SourcesDirectory)'
               tags: '$(tag)'
+  - stage: Deployment
+    displayName: Pull the name image in Container App
+    jobs:
+      - job: Deploy
+        displayName: Pull the name image in Container App
+        steps:
+          - task: AzureContainerApps@0
+            inputs:
+              azureSubscription: 'Motify'
+              acrName: 'motifybackend'
+              imageToDeploy: '$(containerRegistry)/$(imageRepository):$(tag)'
+              containerAppName: 'motify-dev-notification'
+              resourceGroup: 'motify-dev'
+              containerAppEnvironment: 'motify-dev-managed-environment'
+              targetPort: '5038'
