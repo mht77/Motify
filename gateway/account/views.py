@@ -13,6 +13,8 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from account.serializers import AccountSerializer, UserOutputSerializer, UserInputSerializer, UserUpdateSerializer
 from gateway import settings
+from utils.grpc_interceptor import get_client_ip, get_device
+from utils.producers import UserLoggedIn
 
 
 # noinspection PyMethodMayBeStatic
@@ -120,3 +122,25 @@ class GoogleAuthView(APIView):
             return Response(data={'detail': 'validation failed!'}, status=status.HTTP_400_BAD_REQUEST)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class CustomTokenObtain(APIView):
+
+    @swagger_auto_schema(request_body=UserInputSerializer)
+    def post(self, request, *args, **kwargs):
+        device = {'ip': get_client_ip(request), 'device': get_device(request)}
+        try:
+            user = User.objects.get(username=request.data['username'])
+            device['user'] = user.account.id
+            if user.check_password(request.data['password']):
+                device['failed'] = False
+                UserLoggedIn().call(device)
+                return Response(data={'access': str(AccessToken.for_user(user))}, status=status.HTTP_200_OK)
+            else:
+                device['failed'] = True
+                UserLoggedIn().call(device)
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
+        except KeyError:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)

@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package motify.music;
+
+service SongService {
+  rpc Find(SearchRequest) returns (SearchResponse) {}
+}
+
+message SearchRequest{
+  string keyword = 1;
+}
+
+message SearchResponse{
+  repeated Song songs = 1;
+}
+
+message Song{
+  string id = 1;
+  string name = 2;
+  string artist = 3;
+  string album = 4;
+  string genre = 5;
+  string date_added = 6;
+  string file = 7;
+}

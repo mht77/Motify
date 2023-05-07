@@ -6,10 +6,11 @@ class ArtistConfig(AppConfig):
     name = 'artist'
 
     def ready(self):
-        from utils.consumers import UserCreatedListener
+        from utils.consumers import UserCreatedListener, UserLoggedInListener
         threads = []
-        user_listener = UserCreatedListener()
-        threads.append(user_listener)
+        user_created_listener = UserCreatedListener()
+        user_logged_in_listener = UserLoggedInListener()
+        threads.extend([user_created_listener, user_logged_in_listener])
         for thread in threads:
             thread.daemon = True
             thread.start()
