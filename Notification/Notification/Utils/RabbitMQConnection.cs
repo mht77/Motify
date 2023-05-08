@@ -9,10 +9,12 @@ namespace Notification.Utils;
 public class RabbitMQConnection : IRabbitMQConnection
 {
     private const string QueueName = "notif";
-    private const string QueueUser = "notif_user";
+    private const string QueueUserCreated = "notif_user_created";
+    private const string QueueUserDelete = "notif_user_delete";
     private const string Exchange = "notification";
     private readonly IModel channelNotif;
     private readonly IModel channelUser;
+    private readonly IModel channelUserDelete;
     private readonly IConnection conn;
     private readonly ILogger logger;
     private readonly IServiceProvider serviceProvider;
@@ -31,14 +33,17 @@ public class RabbitMQConnection : IRabbitMQConnection
         
         channelNotif = conn.CreateModel();
         channelUser = conn.CreateModel();
+        channelUserDelete = conn.CreateModel();
         
         channelNotif.ExchangeDeclare(Exchange, ExchangeType.Direct);
         
         channelNotif.QueueDeclare(QueueName, true, false, false, null);
-        channelUser.QueueDeclare(QueueUser, true, false, false, null);
+        channelUser.QueueDeclare(QueueUserCreated, true, false, false, null);
+        channelUser.QueueDeclare(QueueUserDelete, true, false, false, null);
         
         channelNotif.QueueBind(QueueName, Exchange, QueueName, null);
-        channelUser.QueueBind(QueueUser, "user-created", QueueUser, null);
+        channelUser.QueueBind(QueueUserCreated, "user-created", QueueUserCreated, null);
+        channelUserDelete.QueueBind(QueueUserDelete, "user-delete", QueueUserDelete, null);
     }
     
     /// <summary>
@@ -48,11 +53,26 @@ public class RabbitMQConnection : IRabbitMQConnection
     public void StartConsuming()
     {
         var consumerNotif = new AsyncEventingBasicConsumer(channelNotif);
-        var consumerUser = new AsyncEventingBasicConsumer(channelUser);
+        var consumerUserCreated = new AsyncEventingBasicConsumer(channelUser);
+        var consumerUserDelete = new AsyncEventingBasicConsumer(channelUser);
         consumerNotif.Received += OnConsumerNotifOnReceived;
-        consumerUser.Received += OnConsumerUserOnReceived;
+        consumerUserCreated.Received += OnConsumerUserOnReceived;
+        consumerUserDelete.Received += OnConsumerUserDeleteOnReceived;
         channelNotif.BasicConsume(queue: QueueName, autoAck: true, consumer: consumerNotif);
-        channelUser.BasicConsume(queue: QueueUser, autoAck: true, consumer: consumerUser);
+        channelUser.BasicConsume(queue: QueueUserCreated, autoAck: true, consumer: consumerUserCreated);
+        channelUserDelete.BasicConsume(queue: QueueUserDelete, autoAck: true, consumer: consumerUserDelete);
+    }
+
+    private async Task OnConsumerUserDeleteOnReceived(object sender, BasicDeliverEventArgs ea)
+    {
+        using (var scope = serviceProvider.CreateScope())
+        {
+            var service = scope.ServiceProvider.GetRequiredService<INotificationService>();
+            var msg = MessagePackSerializer.Deserialize<dynamic>(ea.Body, ContractlessStandardResolver.Options);
+            await service.DeleteUser(msg);
+        }
+
+        await Task.Yield();
     }
 
     private async Task OnConsumerUserOnReceived(object sender, BasicDeliverEventArgs ea)

@@ -14,7 +14,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 from account.serializers import AccountSerializer, UserOutputSerializer, UserInputSerializer, UserUpdateSerializer
 from gateway import settings
 from utils.grpc_interceptor import get_client_ip, get_device
-from utils.producers import UserLoggedIn
+from utils.producers import UserLoggedIn, UserDelete
 
 
 # noinspection PyMethodMayBeStatic
@@ -67,7 +67,7 @@ class AccountView(APIView):
     """
 
     def get_permissions(self):
-        if self.request.method in ['GET', 'PUT']:
+        if self.request.method in ['GET', 'PUT', 'DELETE']:
             return [IsAuthenticated()]
 
     def get(self, request):
@@ -86,6 +86,14 @@ class AccountView(APIView):
     #         serializer.update(instance=request.user.account, validated_data=serializer.data)
     #         return Response(data=AccountSerializer(request.user.account).data, status=status.HTTP_200_OK)
     #     return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request):
+        """
+        Delete the account of the authenticated user
+        """
+        UserDelete().call(AccountSerializer(request.user.account).data)
+        request.user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 # noinspection PyBroadException

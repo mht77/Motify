@@ -64,4 +64,23 @@ public class NotificationService : Notification.NotificationService.Notification
             logger.LogWarning(e.Message);
         }
     }
+
+    public async Task DeleteUser(dynamic account)
+    {
+        using var scope = serviceProvider.CreateScope();
+        var repo = scope.ServiceProvider.GetRequiredService<IRepository<Models.Notification>>();
+        try
+        {
+            var id = account["id"] as string;
+            var notifications = await repo.Find(x => x.User == id);
+            foreach (var notification in notifications)
+            {
+                await repo.Delete(notification.Id.ToString());
+            }
+        }
+        catch (Exception e)
+        {
+            logger.LogWarning(e.Message);
+        }
+    }
 }
