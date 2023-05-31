@@ -7,6 +7,10 @@ service AccountService {
     rpc GetAccounts(GetAccountsRequest) returns (GetAccountsResponse) {}
 }
 
+service UserPlayerAuthService {
+    rpc GetUserToken(GetUserTokenRequest) returns (GetUserTokenResponse) {}
+}
+
 message GetAccountsRequest {
     repeated string id = 1;
 }
@@ -21,6 +25,15 @@ message Account {
     string username = 3;
     string date_joined = 4;
     Subscription subscription = 5;
+}
+
+message GetUserTokenRequest {
+    string id = 1;
+}
+
+message GetUserTokenResponse {
+    string token = 1;
+    string device_id = 2;
 }
 
 enum Subscription {
