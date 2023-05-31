@@ -1,26 +1,46 @@
-from django.http import HttpResponse
-from django.shortcuts import render
-from django.views.decorators.clickjacking import xframe_options_exempt
-from rest_framework.views import APIView
+from asgiref.sync import async_to_sync
+from channels.generic.websocket import JsonWebsocketConsumer
 
-from song.models import Song
-
-
-@xframe_options_exempt
-def player_view(request):
-    song = Song.objects.first()
-    context = {"song": song}
-    return render(request, "player.html", context)
+from user_player.models import UserPlayer, PlayerState
+from user_player.serializers import UserPlayerSerializer
 
 
-class SongView(APIView):
-    # def get(self, request, *args, **kwargs):
-    #     song = Song.objects.first()
-    #     serializer = SongSerializer(song)
-    #     return Response(serializer.data)
+class UserPlayerConsumer(JsonWebsocketConsumer):
+    def connect(self):
+        async_to_sync(self.channel_layer.group_add)(
+            self.scope['user'], self.channel_name
+        )
+        self.accept()
+        print('connected: ', self.scope['user'], self.scope['device'])
+        self.send_json({'message': 'connected'})
+        user_player = UserPlayer.objects.filter(user=self.scope['user']).first()
+        self.send_json(UserPlayerSerializer(user_player).data)
 
-    def post(self, request, *args, **kwargs):
-        song = Song.objects.filter(id=request.data['song']).first()
-        song.no_plays += 1
-        song.save()
-        return HttpResponse("Song updated")
+    def disconnect(self, close_code):
+        user_player = UserPlayer.objects.filter(user=self.scope['user']).first()
+        user_player.state = PlayerState.PAUSED  # needs some changes TODO
+        user_player.save()
+
+    def receive_json(self, content, **kwargs):
+        """
+        Called with decoded JSON content.
+        """
+        user_player = UserPlayer.objects.filter(user=self.scope['user']).first()
+        try:
+            user_player.state = content.get('state', user_player.state)
+            if content.get('song'):
+                user_player.current_song_id = content['song']
+            if content.get('device'):
+                user_player.device_id = content['device']
+            user_player.save()
+        except KeyError:
+            pass
+        async_to_sync(self.channel_layer.group_send)(
+            self.scope['user'], {'type': 'user_player_update', 'message': UserPlayerSerializer(user_player).data}
+        )
+        # self.send_json(UserPlayerSerializer(user_player).data)
+
+    def user_player_update(self, event):
+        self.send_json(event['message'])
+
+

@@ -21,7 +21,9 @@ class CustomGrpcInterceptor(grpc.UnaryUnaryClientInterceptor,
 
     def intercept_unary_stream(self, continuation, client_call_details, request):
         new_detail = _ClientCallDetails(client_call_details.method, client_call_details.timeout,
-                                        (('ip', '777'),), client_call_details.credentials)
+                                        (('ip', get_client_ip(self.request)),
+                                         ('device', get_device(self.request))),
+                                        client_call_details.credentials)
         return continuation(new_detail, request)
 
     def intercept_unary_unary(self, continuation, client_call_details, request):

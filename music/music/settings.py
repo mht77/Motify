@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-57+*+^84c3ubxcklo3s7w+#*19rh9768ow@wx%35_mzmgr!qyx'
+SECRET_KEY = os.environ.get('SECRET', 'django-insecure-57+*+^84c3ubxcklo3s7w+#*19rh9768ow@wx%35_mzmgr!qyx')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -23,6 +23,7 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -52,7 +53,7 @@ ROOT_URLCONF = 'music.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['user_player'],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -66,6 +67,18 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'music.wsgi.application'
+
+ASGI_APPLICATION = 'music.asgi.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [f'redis://:{os.environ.get("REDIS_PASS", "Mohammad@99")}'
+                      f'@{os.environ.get("REDIS", "localhost")}:6379/0'],
+        },
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
@@ -98,6 +111,9 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
 ]
+
+JWT_ACCESS_EXPIRATION_DELTA = 5
+JWT_REFRESH_EXPIRATION_DELTA = 86400
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
