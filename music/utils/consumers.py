@@ -62,7 +62,7 @@ class UserLoggedInListener(RabbitListener):
         try:
             device = msgpack.unpackb(body)
             logging.info(f'User logged in: {device}')
-            entity, _ = Device.objects.get_or_create(ip=device['ip'])
+            entity, _ = Device.objects.filter(user=device['user']).get_or_create(ip=device['ip'])
             entity.name = device['device']
             entity.success = not device['failed']
             entity.user = device['user']
