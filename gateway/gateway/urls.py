@@ -31,4 +31,5 @@ urlpatterns = [
     path('api/', include('account.urls')),
     path('api/', include('music.urls')),
     path('api/', include('notification.urls')),
+    path('api/', include('playlist.urls')),
 ]

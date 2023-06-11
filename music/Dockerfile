@@ -6,6 +6,7 @@ COPY /music/requirements.txt /code/music/
 COPY /protos/account.proto /code/protos/
 COPY /protos/artist.proto /code/protos/
 COPY /protos/song.proto /code/protos/
+COPY /protos/common.proto /code/protos/
 RUN python -m pip install --upgrade pip
 RUN pip install -r requirements.txt
 COPY /music/ /code/music/

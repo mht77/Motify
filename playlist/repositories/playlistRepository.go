@@ -26,7 +26,7 @@ func (repository *PlaylistRepository) GetById(id string) (*models.Playlist, erro
 
 func (repository *PlaylistRepository) GetAll(userId string) (*[]models.Playlist, error) {
 	var playlists []models.Playlist
-	err := repository.db.Preload("Songs").Where("user = ?", userId).Find(&playlists).Error
+	err := repository.db.Preload("Songs").Find(&playlists, `"user" = ?`, userId).Error
 	return &playlists, err
 }
 
