@@ -4,7 +4,7 @@
 // - protoc             v3.21.12
 // source: playlist.proto
 
-package proto
+package services
 
 import (
 	context "context"
@@ -26,6 +26,7 @@ type PlaylistServiceClient interface {
 	Delete(ctx context.Context, in *SongId, opts ...grpc.CallOption) (*SongId, error)
 	GetById(ctx context.Context, in *SongId, opts ...grpc.CallOption) (*CreateResponse, error)
 	GetAll(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*GetAllResponse, error)
+	AddSongsToPlaylist(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (*CreateResponse, error)
 }
 
 type playlistServiceClient struct {
@@ -72,6 +73,15 @@ func (c *playlistServiceClient) GetAll(ctx context.Context, in *UserId, opts ...
 	return out, nil
 }
 
+func (c *playlistServiceClient) AddSongsToPlaylist(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (*CreateResponse, error) {
+	out := new(CreateResponse)
+	err := c.cc.Invoke(ctx, "/motify.playlist.PlaylistService/AddSongsToPlaylist", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PlaylistServiceServer is the server API for PlaylistService service.
 // All implementations must embed UnimplementedPlaylistServiceServer
 // for forward compatibility
@@ -80,6 +90,7 @@ type PlaylistServiceServer interface {
 	Delete(context.Context, *SongId) (*SongId, error)
 	GetById(context.Context, *SongId) (*CreateResponse, error)
 	GetAll(context.Context, *UserId) (*GetAllResponse, error)
+	AddSongsToPlaylist(context.Context, *AddRequest) (*CreateResponse, error)
 	mustEmbedUnimplementedPlaylistServiceServer()
 }
 
@@ -98,6 +109,9 @@ func (UnimplementedPlaylistServiceServer) GetById(context.Context, *SongId) (*Cr
 }
 func (UnimplementedPlaylistServiceServer) GetAll(context.Context, *UserId) (*GetAllResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAll not implemented")
+}
+func (UnimplementedPlaylistServiceServer) AddSongsToPlaylist(context.Context, *AddRequest) (*CreateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddSongsToPlaylist not implemented")
 }
 func (UnimplementedPlaylistServiceServer) mustEmbedUnimplementedPlaylistServiceServer() {}
 
@@ -184,6 +198,24 @@ func _PlaylistService_GetAll_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PlaylistService_AddSongsToPlaylist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlaylistServiceServer).AddSongsToPlaylist(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/motify.playlist.PlaylistService/AddSongsToPlaylist",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlaylistServiceServer).AddSongsToPlaylist(ctx, req.(*AddRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PlaylistService_ServiceDesc is the grpc.ServiceDesc for PlaylistService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -206,6 +238,10 @@ var PlaylistService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAll",
 			Handler:    _PlaylistService_GetAll_Handler,
+		},
+		{
+			MethodName: "AddSongsToPlaylist",
+			Handler:    _PlaylistService_AddSongsToPlaylist_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

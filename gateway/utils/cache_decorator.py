@@ -1,3 +1,5 @@
+import logging
+
 from django.core.cache import cache
 
 from rest_framework import status
@@ -10,7 +12,7 @@ def use_cache(func):
         key = func.__name__ + type(viewClass).__name__
         if kwargs.get('pk'):
             key += str(kwargs['pk'])
-        print(key)
+        logging.info(key)
         try:
             date = cache.get(key)
             if date:
@@ -20,13 +22,14 @@ def use_cache(func):
         except ValueError:
             pass
         except Exception as e:
-            print(e)
+            logging.error(e)
         res = func(viewClass, *args, **kwargs)
         res.accepted_renderer = JSONRenderer()
         res.accepted_media_type = "application/json"
         res.renderer_context = {}
         res.render()
-        cache.set(key, res.data)
+        if res.status_code == 200 or res.status_code == 201:
+            cache.set(key, res.data)
         return res
 
     return wrapper
