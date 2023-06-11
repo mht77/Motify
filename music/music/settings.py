@@ -17,7 +17,9 @@ ALLOWED_HOSTS = [
     'localhost',
     '0.0.0.0',
     os.environ.get('URL', '127.0.0.1'),
-    os.environ.get('WEB', 'http://localhost:3000')
+    os.environ.get('WEB', 'http://localhost:3000'),
+    '192.168.2.12',
+    os.environ.get('Socket', '192.168.2.12'),
 ]
 
 # Application definition
@@ -80,8 +82,14 @@ CHANNEL_LAYERS = {
     },
 }
 
-# Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': f'redis://:{os.environ.get("REDIS_PASS", "Mohammad@99")}'
+                    f'@{os.environ.get("REDIS", "localhost")}:6379',
+        'TIMEOUT': 86400
+    }
+}
 
 DATABASES = {
     'default': {
@@ -133,7 +141,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AZURE_STORAGE_NAME = 'motifyfiles'
+AZURE_STORAGE_NAME = os.environ.get('AZURE_STORAGE_NAME', 'motifyfiles')
 
 AZURE_STORAGE_CONTAINER = 'songs'
 
