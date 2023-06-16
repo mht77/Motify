@@ -82,3 +82,4 @@ stages:
               resourceGroup: 'motify-dev'
               containerAppEnvironment: 'motify-dev-managed-environment'
               targetPort: '60051'
+              ingress: 'internal'
