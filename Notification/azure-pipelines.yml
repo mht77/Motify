@@ -69,7 +69,7 @@ stages:
           - task: AzureContainerApps@0
             inputs:
               azureSubscription: 'Motify'
-              acrName: 'motifybackend'
+              acrName: 'motifyregistery'
               imageToDeploy: '$(containerRegistry)/$(imageRepository):$(tag)'
               containerAppName: 'motify-dev-notification'
               resourceGroup: 'motify-dev'
