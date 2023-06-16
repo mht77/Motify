@@ -18,8 +18,7 @@ ALLOWED_HOSTS = [
     '0.0.0.0',
     os.environ.get('URL', '127.0.0.1'),
     os.environ.get('WEB', 'http://localhost:3000'),
-    '192.168.2.12',
-    os.environ.get('Socket', '192.168.2.12'),
+    os.environ.get('Socket', '127.0.0.1'),
 ]
 
 # Application definition
