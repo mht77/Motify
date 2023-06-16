@@ -9,6 +9,7 @@ service PlaylistService{
   rpc Delete(SongId) returns (SongId){}
   rpc GetById(SongId) returns (CreateResponse){}
   rpc GetAll(UserId) returns (GetAllResponse){}
+  rpc AddSongsToPlaylist (AddRequest) returns (CreateResponse){}
 }
 
 message CreateRequest{
@@ -35,4 +36,9 @@ message UserId{
 
 message SongId{
   string id = 1;
+}
+
+message AddRequest{
+  string playlist = 1;
+  repeated string songs = 2;
 }

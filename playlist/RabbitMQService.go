@@ -98,6 +98,7 @@ func StartListening(playlistRepo services.PlaylistRepository) {
 					User:        result["id"].(string),
 					Id:          uuid.NewString(),
 					DateCreated: fmt.Sprintf("%d-%02d-%02d", now.Year(), now.Month(), now.Day()),
+					Songs:       []models.Song{},
 				}
 				_, err = playlistRepo.Create(playlist)
 				if err != nil {

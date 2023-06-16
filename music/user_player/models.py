@@ -25,6 +25,9 @@ class Device(models.Model):
 
     success = models.BooleanField(default=False)
 
+    class Meta:
+        unique_together = (('user', 'ip'), )
+
     def __str__(self):
         return self.ip + '_' + self.name
 

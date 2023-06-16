@@ -1,9 +1,12 @@
 syntax = "proto3";
 
+import "common.proto";
+
 package motify.music;
 
 service SongService {
   rpc Find(SearchRequest) returns (SearchResponse) {}
+  rpc GetSongs(common.Ids) returns (SearchResponse) {}
 }
 
 message SearchRequest{

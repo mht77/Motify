@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package motify.common;
+
+message Ids{
+    repeated string id = 1;
+}

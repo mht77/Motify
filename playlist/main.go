@@ -11,11 +11,11 @@ import (
 	"playlist/models"
 	"playlist/repositories"
 	"playlist/services"
-	"playlist/services/proto"
+	proto "playlist/services/proto"
 )
 
 func main() {
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disable",
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d",
 		os.Getenv("DB_HOST"), os.Getenv("DB_USER"), os.Getenv("DB_PASS"), os.Getenv("DB_NAME"), 5432)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {

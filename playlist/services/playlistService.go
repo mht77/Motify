@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 	"log"
 	"playlist/models"
-	"playlist/services/proto"
+	proto "playlist/services/proto"
 	"time"
 )
 
@@ -87,6 +87,36 @@ func (service *PlaylistService) GetAll(_ context.Context, request *proto.UserId)
 		})
 	}
 	return &proto.GetAllResponse{Playlists: playlistResponses}, nil
+}
+
+func (service *PlaylistService) AddSongsToPlaylist(_ context.Context, request *proto.AddRequest) (*proto.CreateResponse, error) {
+	playlist, err := service.PlaylistRepository.GetById(request.Playlist)
+	if err != nil {
+		return nil, err
+	}
+	for _, songId := range request.Songs {
+		exist := false
+		for _, song := range playlist.Songs {
+			if song.Id == songId {
+				exist = true
+				break
+			}
+		}
+		if !exist {
+			playlist.Songs = append(playlist.Songs, models.Song{Id: songId})
+		}
+	}
+	updated, err := service.PlaylistRepository.Update(*playlist)
+	if err != nil {
+		return nil, err
+	}
+	return &proto.CreateResponse{
+		Id:          updated.Id,
+		User:        updated.User,
+		Name:        updated.Name,
+		DateCreated: updated.DateCreated,
+		Songs:       SongIdsFromSongModels(updated.Songs),
+	}, nil
 }
 
 type SongRepository interface {
