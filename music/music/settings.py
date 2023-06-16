@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-57+*+^84c3ubxcklo3s7w+#*19rh9768ow@wx%35_mzmgr!qyx'
+SECRET_KEY = os.environ.get('SECRET', 'django-insecure-57+*+^84c3ubxcklo3s7w+#*19rh9768ow@wx%35_mzmgr!qyx')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -17,12 +17,15 @@ ALLOWED_HOSTS = [
     'localhost',
     '0.0.0.0',
     os.environ.get('URL', '127.0.0.1'),
-    os.environ.get('WEB', 'http://localhost:3000')
+    os.environ.get('WEB', 'http://localhost:3000'),
+    '192.168.2.12',
+    os.environ.get('Socket', '192.168.2.12'),
 ]
 
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -52,7 +55,7 @@ ROOT_URLCONF = 'music.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['user_player'],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -67,8 +70,26 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'music.wsgi.application'
 
-# Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
+ASGI_APPLICATION = 'music.asgi.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [f'redis://:{os.environ.get("REDIS_PASS", "Mohammad@99")}'
+                      f'@{os.environ.get("REDIS", "localhost")}:6379/0'],
+        },
+    },
+}
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': f'redis://:{os.environ.get("REDIS_PASS", "Mohammad@99")}'
+                    f'@{os.environ.get("REDIS", "localhost")}:6379',
+        'TIMEOUT': 86400
+    }
+}
 
 DATABASES = {
     'default': {
@@ -99,6 +120,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+JWT_ACCESS_EXPIRATION_DELTA = 5
+JWT_REFRESH_EXPIRATION_DELTA = 86400
+
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
@@ -117,7 +141,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AZURE_STORAGE_NAME = 'motifyfiles'
+AZURE_STORAGE_NAME = os.environ.get('AZURE_STORAGE_NAME', 'motifyfiles')
 
 AZURE_STORAGE_CONTAINER = 'songs'
 

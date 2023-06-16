@@ -13,6 +13,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '0.0.0.0',
+    '192.168.2.12',
     os.environ.get('URL', '127.0.0.1'),
 ]
 
@@ -56,7 +57,7 @@ CORS_ORIGIN_ALLOW_ALL = False
 
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:3000',
-    os.environ.get('WEB', 'http://localhost:3000')
+    os.environ.get('WEB', 'http://192.168.2.12:3000'),
 )
 
 
@@ -151,4 +152,5 @@ CELERY_CACHE_BACKEND = 'default'
 SERVICES = {
     'music': os.environ.get('MUSIC_SERVICE', 'localhost:50062'),
     'notification': os.environ.get('NOTIFICATION_SERVICE', 'localhost:5038'),
+    'playlist': os.environ.get('PLAYLIST_SERVICE', 'localhost:60051'),
 }

@@ -1,14 +1,12 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.conf.urls.static import static
 
 from music import settings
-from user_player.views import player_view, SongView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('player/', player_view),
-    path('song/', SongView.as_view()),
+    path('', include('user_player.urls')),
 ]
 
 if settings.MEDIA_ROOT:

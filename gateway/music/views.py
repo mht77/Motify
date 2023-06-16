@@ -51,7 +51,7 @@ class ArtistsView(APIView):
             try:
                 res = stub.CreateArtist(artist)
                 artist = MessageToDict(res)
-                artist['account'] = AccountSerializer(Account.objects.get(id=artist['user'])).data
+                artist['account'] = AccountSerializer(Account.objects.get(id=request.data['user'])).data
                 cache.delete(f'get{self.__class__.__name__}')
                 return Response(data=artist, status=status.HTTP_201_CREATED)
             except grpc.RpcError as e:

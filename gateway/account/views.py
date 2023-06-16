@@ -1,9 +1,13 @@
+import logging
+
+import grpc
 import requests
 from django.contrib.auth.models import User
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token
+from google.protobuf.json_format import MessageToDict
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -11,10 +15,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 
+import account_pb2
+import account_pb2_grpc
 from account.serializers import AccountSerializer, UserOutputSerializer, UserInputSerializer, UserUpdateSerializer
 from gateway import settings
-from utils.grpc_interceptor import get_client_ip, get_device
-from utils.producers import UserLoggedIn
+from gateway.settings import SERVICES
+from utils.grpc_interceptor import get_client_ip, get_device, CustomGrpcInterceptor
+from utils.producers import UserLoggedIn, UserDelete
 
 
 # noinspection PyMethodMayBeStatic
@@ -67,7 +74,7 @@ class AccountView(APIView):
     """
 
     def get_permissions(self):
-        if self.request.method in ['GET', 'PUT']:
+        if self.request.method in ['GET', 'PUT', 'DELETE']:
             return [IsAuthenticated()]
 
     def get(self, request):
@@ -86,6 +93,14 @@ class AccountView(APIView):
     #         serializer.update(instance=request.user.account, validated_data=serializer.data)
     #         return Response(data=AccountSerializer(request.user.account).data, status=status.HTTP_200_OK)
     #     return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request):
+        """
+        Delete the account of the authenticated user
+        """
+        UserDelete().call(AccountSerializer(request.user.account).data)
+        request.user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 # noinspection PyBroadException
@@ -130,7 +145,7 @@ class CustomTokenObtain(APIView):
     def post(self, request, *args, **kwargs):
         device = {'ip': get_client_ip(request), 'device': get_device(request)}
         try:
-            user = User.objects.get(username=request.data['username'])
+            user = User.objects.get(username=request.data['email'])
             device['user'] = user.account.id
             if user.check_password(request.data['password']):
                 device['failed'] = False
@@ -144,3 +159,31 @@ class CustomTokenObtain(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+
+class UserPlayerToken(APIView):
+    """
+    handles user player token
+    """
+
+    def get_permissions(self):
+        if self.request.method in ['GET']:
+            return [IsAuthenticated()]
+
+    def get(self, request):
+        """
+        Return the player token of the authenticated user
+        """
+        with grpc.insecure_channel(SERVICES['music']) as channel:
+            channel = grpc.intercept_channel(channel, CustomGrpcInterceptor(request))
+            stub = account_pb2_grpc.UserPlayerAuthServiceStub(channel)
+            try:
+                res = stub.GetUserToken(account_pb2.GetUserTokenRequest(id=request.user.account.id))
+                data = MessageToDict(res)
+                return Response(data=data, status=status.HTTP_200_OK)
+            except grpc.RpcError as e:
+                logging.error(e)
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                logging.error(e)
+                return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)

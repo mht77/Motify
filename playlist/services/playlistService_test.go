@@ -2,7 +2,7 @@ package services
 
 import (
 	"playlist/models"
-	"playlist/services/proto"
+	proto "playlist/services/proto"
 	"testing"
 )
 

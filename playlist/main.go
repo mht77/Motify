@@ -11,7 +11,7 @@ import (
 	"playlist/models"
 	"playlist/repositories"
 	"playlist/services"
-	"playlist/services/proto"
+	proto "playlist/services/proto"
 )
 
 func main() {

@@ -2,8 +2,9 @@ version: "3.9"
 
 services:
   db:
-    image: postgres
+    image: postgres:14
     container_name: db
+    command: postgres -c 'max_connections=600'
     volumes:
       - ~/motify/data/db:/var/lib/postgresql/data
     environment:
@@ -54,6 +55,7 @@ services:
       - REDIS=redis
       - MUSIC_SERVICE=music:50061
       - NOTIFICATION_SERVICE=notification:5038
+      - PLAYLIST_SERVICE=playlist:60051
     depends_on:
       - db
       - redis
@@ -103,6 +105,7 @@ services:
       - POSTGRES_HOST=db
       - GRPC_PORT=50061
       - RABBITMQ_HOST=rabbitmq
+      - REDIS=redis
       - GRPC_ADDRESS=music
     depends_on:
       - db
