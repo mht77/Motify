@@ -14,7 +14,6 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  dockerRegistryServiceConnection: 'a4d10f07-2d31-481c-9fc0-77de7e0a6cd2'
   imageRepository: 'motifyplaylist'
   containerRegistry: 'motifyregistery.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/playlist/Dockerfile'
@@ -62,7 +61,7 @@ stages:
           - task: Docker@2
             displayName: Build and push an image to container registry
             inputs:
-              containerRegistry: '$(dockerRegistryServiceConnection)'
+              containerRegistry: 'motifyregistery'
               repository: '$(imageRepository)'
               command: 'buildAndPush'
               Dockerfile: '$(dockerfilePath)'
