@@ -12,6 +12,7 @@ from rest_framework.views import APIView
 
 import artist_pb2
 import artist_pb2_grpc
+import common_pb2
 import song_pb2
 import song_pb2_grpc
 from account.models import Account
@@ -29,7 +30,7 @@ class ArtistsView(APIView):
         with grpc.insecure_channel(SERVICES['music']) as channel:
             stub = artist_pb2_grpc.ArtistServiceStub(channel)
             try:
-                res = stub.GetArtists(artist_pb2.Ids(id=[]))
+                res = stub.GetArtists(common_pb2.Ids(id=[]))
                 artists = MessageToDict(res)['artists']
                 for artist in artists:
                     artist['account'] = AccountSerializer(Account.objects.get(id=artist['user'])).data

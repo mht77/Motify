@@ -17,7 +17,7 @@ ALLOWED_HOSTS = [
     'localhost',
     '0.0.0.0',
     os.environ.get('URL', '127.0.0.1'),
-    os.environ.get('WEB', 'http://localhost:3000'),
+    os.environ.get('WEB', 'localhost:3000'),
     os.environ.get('Socket', '127.0.0.1'),
 ]
 
@@ -105,6 +105,12 @@ CORS_ORIGIN_ALLOW_ALL = False
 
 CORS_ORIGIN_WHITELIST = [
     os.environ.get('WEB', 'http://localhost')
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',
+    os.environ.get('URL', 'http://localhost:3000'),
+    os.environ.get('CSRF_WHITELIST', 'http://127.0.0.1:3000'),
 ]
 
 # Password validation
