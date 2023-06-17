@@ -5,8 +5,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# TODO use env var
-SECRET_KEY = 'django-insecure-!iu@upgh+j8ay_ll^xlsa-xyp=-uoyy9%4lu1ejha&l2*6a(e7'
+SECRET_KEY = os.environ.get('SECRET', 'django-insecure-!iu@upgh+j8ay_ll^xlsa-xyp=-uoyy9%4lu1ejha&l2*6a(e7')
 
 DEBUG = True
 
@@ -56,8 +55,14 @@ CORS_ORIGIN_ALLOW_ALL = False
 
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:3000',
-    os.environ.get('WEB', 'http://192.168.2.12:3000'),
+    os.environ.get('WEB', 'http://127.0.0.1:3000'),
 )
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',
+    os.environ.get('URL', 'http://localhost:3000'),
+    os.environ.get('CSRF_WHITELIST', 'http://127.0.0.1:3000'),
+]
 
 
 ROOT_URLCONF = 'gateway.urls'
