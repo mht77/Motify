@@ -104,12 +104,12 @@ DATABASES = {
 CORS_ORIGIN_ALLOW_ALL = False
 
 CORS_ORIGIN_WHITELIST = [
-    os.environ.get('WEB', 'http://localhost')
+    os.environ.get('WEB', 'http://localhost'),
+    os.environ.get('CORS_WHITELIST', 'http://localhost'),
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
-    os.environ.get('URL', 'http://localhost:3000'),
     os.environ.get('CSRF_WHITELIST', 'http://127.0.0.1:3000'),
 ]
 
