@@ -8,6 +8,7 @@ This project consists of 3 services and a custom API Gateway.
 - Music Service: Python Django
 - Notification Service: ASP.NET
 - Playlist Service: Golang
+- Frontend: [Github](https://github.com/mht77/Motify-WebClient)
 
 - Communications between services: gRPC & message broker (rabbitmq)
 - DB: Postgres, Azure Blob Storage for files
